@@ -17,6 +17,7 @@ import Dashboard from './components/Dashboard';
 import QuizSetup from './components/QuizSetup';
 import QuizQuestion from './components/QuizQuestion';
 import QuizResults from './components/QuizResults';
+import Flashcard from './components/Flashcard';
 import Timer from './components/Timer';
 import ConfirmModal from './components/ConfirmModal';
 import Toast from './components/Toast';
@@ -248,9 +249,39 @@ export default function App() {
     showToast('Niepoprawny plik backupu', 'danger');
   };
 
-  // --- Skróty klawiszowe (tylko w widoku quizu) ---
+  // --- Fiszki: ocena karty (wiem / nie wiem) ---
+  const rateFlashcard = (knew: boolean) => {
+    if (!session || session.mode !== 'flashcards') return;
+    const q = session.questions[session.currentIdx];
+    recordAnswer(q.id, knew);
+    const isLast = session.currentIdx === session.questions.length - 1;
+    const newCorrect = session.correctCount + (knew ? 1 : 0);
+    const newWrong = session.wrongCount + (knew ? 0 : 1);
+
+    if (isLast) {
+      // fiszki nie mają osobnego ekranu wyników — toast + powrót
+      setAppState((prev) => ({
+        ...prev,
+        stats: { ...prev.stats, sessions: prev.stats.sessions + 1 },
+      }));
+      showToast(`Fiszki: ${newCorrect} wiem, ${newWrong} nie wiem`);
+      setSession(null);
+      setView('home');
+      return;
+    }
+
+    setSession({
+      ...session,
+      currentIdx: session.currentIdx + 1,
+      correctCount: newCorrect,
+      wrongCount: newWrong,
+    });
+  };
+
+  // --- Skróty klawiszowe (tylko w widoku quizu, pomijamy fiszki) ---
   useEffect(() => {
     if (view !== 'quiz' || !session) return;
+    if (session.mode === 'flashcards') return;
     const handler = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
       const mapping: Record<string, number> = {
@@ -315,7 +346,17 @@ export default function App() {
         />
       )}
 
-      {view === 'quiz' && session && (
+      {view === 'quiz' && session && session.mode === 'flashcards' && (
+        <Flashcard
+          question={session.questions[session.currentIdx]}
+          currentIdx={session.currentIdx}
+          total={session.questions.length}
+          onRate={rateFlashcard}
+          onExit={() => setExitOpen(true)}
+        />
+      )}
+
+      {view === 'quiz' && session && session.mode !== 'flashcards' && (
         <QuizQuestion
           question={session.questions[session.currentIdx]}
           mode={session.mode}

@@ -54,12 +54,18 @@ export default function Dashboard({
         />
       </section>
 
-      <section className="mt-6 grid gap-3 sm:grid-cols-3">
+      <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <ModeCard
           title="Praktyka"
           description="Wybierz kategorię i liczbę pytań. Feedback od razu po odpowiedzi."
           actionLabel="Zacznij"
           onClick={() => onStartMode('practice')}
+        />
+        <ModeCard
+          title="Fiszki"
+          description="Pytanie z odsłanianą odpowiedzią. Sam oceniasz: wiem / nie wiem."
+          actionLabel="Fiszki"
+          onClick={() => onStartMode('flashcards')}
         />
         <ModeCard
           title="Powtórki"

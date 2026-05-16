@@ -3,7 +3,7 @@ import type { Category, SetupConfig } from '../types';
 import { CATEGORIES, QUESTIONS } from '../data/questions';
 
 type Props = {
-  mode: 'practice' | 'review';
+  mode: 'practice' | 'review' | 'flashcards';
   wrongIdsCount: number;
   onCancel: () => void;
   onStart: (config: SetupConfig) => void;
@@ -11,6 +11,12 @@ type Props = {
 
 const COUNT_OPTIONS = [5, 10, 20, 30, 50] as const;
 const REVIEW_MAX = 30;
+
+const TITLES: Record<Props['mode'], string> = {
+  practice: 'Praktyka',
+  review: 'Powtórki',
+  flashcards: 'Fiszki',
+};
 
 export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Props) {
   const isReview = mode === 'review';
@@ -52,13 +58,13 @@ export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Pr
         ← Wróć
       </button>
 
-      <h1 className="text-2xl font-semibold text-text">
-        {isReview ? 'Powtórki' : 'Praktyka'}
-      </h1>
+      <h1 className="text-2xl font-semibold text-text">{TITLES[mode]}</h1>
       <p className="mt-1 text-sm text-text-muted">
         {isReview
           ? `Tylko pytania, na które kiedyś odpowiedziałeś źle. Dostępnych: ${wrongIdsCount}.`
-          : 'Wybierz kategorie (puste = wszystkie) i liczbę pytań.'}
+          : mode === 'flashcards'
+            ? 'Wybierz kategorie (puste = wszystkie) i liczbę fiszek. Sam oceniasz, czy wiedziałeś odpowiedź.'
+            : 'Wybierz kategorie (puste = wszystkie) i liczbę pytań.'}
       </p>
 
       {!isReview && (
@@ -140,7 +146,7 @@ export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Pr
         disabled={availableCount === 0}
         className="mt-8 w-full rounded-md bg-accent px-4 py-3 text-sm font-medium text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
       >
-        Zacznij quiz
+        {mode === 'flashcards' ? 'Zacznij fiszki' : 'Zacznij quiz'}
       </button>
     </main>
   );

@@ -46,7 +46,7 @@ export type AppState = {
   wrongIds: number[];
 };
 
-export type QuizMode = 'practice' | 'review' | 'exam';
+export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards';
 
 export type View = 'home' | 'setup' | 'quiz' | 'results';
 
