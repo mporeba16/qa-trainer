@@ -2,6 +2,7 @@ import { useRef, type ChangeEvent } from 'react';
 import type { AppState, QuizMode } from '../types';
 import { parseProgress } from '../utils/progressIO';
 import CategoryBreakdown from './CategoryBreakdown';
+import ProgressChart from './ProgressChart';
 
 type Props = {
   appState: AppState;
@@ -84,6 +85,13 @@ export default function Dashboard({
           actionLabel="Egzamin"
           onClick={() => onStartMode('exam')}
         />
+      </section>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
+          Trend skuteczności
+        </h2>
+        <ProgressChart history={appState.sessionHistory ?? []} />
       </section>
 
       <section className="mt-8">

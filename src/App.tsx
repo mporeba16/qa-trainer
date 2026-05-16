@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   AppState,
   QuizMode,
+  SessionRecord,
   SessionState,
   SetupConfig,
   View,
@@ -184,6 +185,12 @@ export default function App() {
             ? 0
             : (correctCount / s.questions.length) * 100;
         const isExamPass = s.mode === 'exam' && pct >= EXAM_PASS;
+        const newRecord: SessionRecord = {
+          timestamp: Date.now(),
+          mode: s.mode,
+          total: s.questions.length,
+          correct: correctCount,
+        };
         return {
           ...prev,
           stats: {
@@ -193,6 +200,7 @@ export default function App() {
               prev.stats.examsAttempted + (s.mode === 'exam' ? 1 : 0),
             examsPassed: prev.stats.examsPassed + (isExamPass ? 1 : 0),
           },
+          sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
         };
       });
       return { ...s, correctCount, wrongCount, endTime: Date.now() };
@@ -260,10 +268,19 @@ export default function App() {
 
     if (isLast) {
       // fiszki nie mają osobnego ekranu wyników — toast + powrót
-      setAppState((prev) => ({
-        ...prev,
-        stats: { ...prev.stats, sessions: prev.stats.sessions + 1 },
-      }));
+      setAppState((prev) => {
+        const newRecord: SessionRecord = {
+          timestamp: Date.now(),
+          mode: 'flashcards',
+          total: session.questions.length,
+          correct: newCorrect,
+        };
+        return {
+          ...prev,
+          stats: { ...prev.stats, sessions: prev.stats.sessions + 1 },
+          sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
+        };
+      });
       showToast(`Fiszki: ${newCorrect} wiem, ${newWrong} nie wiem`);
       setSession(null);
       setView('home');

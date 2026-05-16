@@ -39,12 +39,22 @@ export type GlobalStats = {
 
 export type Theme = 'light' | 'dark';
 
+// Rekord pojedynczej zakończonej sesji — feed dla wykresu trendu.
+export type SessionRecord = {
+  timestamp: number; // ms timestamp zakończenia
+  mode: QuizMode;
+  total: number;
+  correct: number;
+};
+
 // AppState = wszystko co persistujemy w localStorage (jeden klucz, jeden obiekt).
 // Theme trzymamy osobno przez useTheme — żeby toggle nie musiał ruszać całego stanu.
+// sessionHistory: optional dla backward compat — istniejący LS bez tego pola czyta jako undefined.
 export type AppState = {
   stats: GlobalStats;
   questionStats: Record<number, QuestionStat>;
   wrongIds: number[];
+  sessionHistory?: SessionRecord[];
 };
 
 export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards';
@@ -80,4 +90,5 @@ export const DEFAULT_APP_STATE: AppState = {
   },
   questionStats: {},
   wrongIds: [],
+  sessionHistory: [],
 };

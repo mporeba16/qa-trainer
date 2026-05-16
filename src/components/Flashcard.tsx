@@ -24,6 +24,31 @@ export default function Flashcard({
     setRevealed(false);
   }, [question.id]);
 
+  // skróty klawiszowe: Space/Enter = pokaż; po pokazaniu: 1/N = nie wiem, 2/W = wiem
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+      const k = e.key.toLowerCase();
+      if (!revealed) {
+        if (e.key === ' ' || e.key === 'Enter') {
+          e.preventDefault();
+          setRevealed(true);
+        }
+        return;
+      }
+      if (e.key === '1' || k === 'n') {
+        e.preventDefault();
+        onRate(false);
+      } else if (e.key === '2' || k === 'w') {
+        e.preventDefault();
+        onRate(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [revealed, onRate]);
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
       <div className="mb-4 flex items-center justify-between gap-2">
