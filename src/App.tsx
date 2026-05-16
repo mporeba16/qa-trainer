@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   AppState,
   QuizMode,
@@ -11,6 +11,7 @@ import { QUESTIONS } from './data/questions';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useTheme } from './hooks/useTheme';
 import { shuffle } from './utils/shuffle';
+import { exportProgress } from './utils/progressIO';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import QuizSetup from './components/QuizSetup';
@@ -18,11 +19,15 @@ import QuizQuestion from './components/QuizQuestion';
 import QuizResults from './components/QuizResults';
 import Timer from './components/Timer';
 import ConfirmModal from './components/ConfirmModal';
+import Toast from './components/Toast';
 
 const EXAM_DURATION_SEC = 60 * 60;
 const EXAM_COUNT = 40;
 const EXAM_PASS = 65;
 const REVIEW_MAX = 30;
+const TOAST_MS = 3000;
+
+type ToastState = { message: string; type: 'success' | 'danger' };
 
 export default function App() {
   const [appState, setAppState] = useLocalStorage<AppState>(
@@ -36,6 +41,29 @@ export default function App() {
   const [session, setSession] = useState<SessionState | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
+  const [pendingImport, setPendingImport] = useState<AppState | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'danger' = 'success') => {
+    if (toastTimerRef.current !== null) {
+      window.clearTimeout(toastTimerRef.current);
+    }
+    setToast({ message, type });
+    toastTimerRef.current = window.setTimeout(() => {
+      setToast(null);
+      toastTimerRef.current = null;
+    }, TOAST_MS);
+  };
+
+  // cleanup timera przy unmount
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current !== null) {
+        window.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   // --- Start ---
   const startMode = (mode: QuizMode) => {
@@ -139,7 +167,6 @@ export default function App() {
       let correctCount = s.correctCount;
       let wrongCount = s.wrongCount;
       if (s.mode === 'exam') {
-        // exam: zliczamy + zapisujemy wszystko dopiero teraz
         correctCount = 0;
         wrongCount = 0;
         s.questions.forEach((q, i) => {
@@ -150,7 +177,6 @@ export default function App() {
           recordAnswer(q.id, isCorrect);
         });
       }
-      // sesje + statystyki egzaminów
       setAppState((prev) => {
         const pct =
           s.questions.length === 0
@@ -197,6 +223,29 @@ export default function App() {
   const resetAll = () => {
     setAppState(DEFAULT_APP_STATE);
     setResetOpen(false);
+    showToast('Postęp zresetowany');
+  };
+
+  // --- Backup: eksport / import ---
+  const handleExport = () => {
+    exportProgress(appState);
+    showToast('Backup pobrany');
+  };
+
+  const handleImportRequest = (state: AppState) => {
+    setPendingImport(state);
+  };
+
+  const confirmImport = () => {
+    if (!pendingImport) return;
+    const count = pendingImport.stats.totalAnswered;
+    setAppState(pendingImport);
+    setPendingImport(null);
+    showToast(`Zaimportowano backup (${count} odp.)`);
+  };
+
+  const handleImportError = () => {
+    showToast('Niepoprawny plik backupu', 'danger');
   };
 
   // --- Skróty klawiszowe (tylko w widoku quizu) ---
@@ -232,7 +281,6 @@ export default function App() {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-    // selectAnswer/submitAnswer/goNext są closure'ami nad `session` — wystarczy re-bind przy zmianie session
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, session]);
 
@@ -246,7 +294,13 @@ export default function App() {
       />
 
       {view === 'home' && (
-        <Dashboard appState={appState} onStartMode={startMode} />
+        <Dashboard
+          appState={appState}
+          onStartMode={startMode}
+          onExport={handleExport}
+          onImport={handleImportRequest}
+          onImportError={handleImportError}
+        />
       )}
 
       {view === 'setup' && pendingMode && pendingMode !== 'exam' && (
@@ -332,6 +386,28 @@ export default function App() {
         onConfirm={exitQuiz}
         onCancel={() => setExitOpen(false)}
       />
+
+      <ConfirmModal
+        open={pendingImport !== null}
+        title="Nadpisać postęp?"
+        message={
+          pendingImport
+            ? `Backup zastąpi obecne staty (${pendingImport.stats.totalAnswered} odp., ${pendingImport.wrongIds.length} powtórek).`
+            : ''
+        }
+        confirmLabel="Importuj"
+        danger
+        onConfirm={confirmImport}
+        onCancel={() => setPendingImport(null)}
+      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

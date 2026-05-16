@@ -1,18 +1,46 @@
+import { useRef, type ChangeEvent } from 'react';
 import type { AppState, QuizMode } from '../types';
+import { parseProgress } from '../utils/progressIO';
 import CategoryBreakdown from './CategoryBreakdown';
 
 type Props = {
   appState: AppState;
   onStartMode: (mode: QuizMode) => void;
+  onExport: () => void;
+  onImport: (state: AppState) => void;
+  onImportError: () => void;
 };
 
-export default function Dashboard({ appState, onStartMode }: Props) {
+export default function Dashboard({
+  appState,
+  onStartMode,
+  onExport,
+  onImport,
+  onImportError,
+}: Props) {
   const { stats, wrongIds, questionStats } = appState;
   const accuracy =
     stats.totalAnswered === 0
       ? 0
       : Math.round((stats.totalCorrect / stats.totalAnswered) * 100);
   const reviewDisabled = wrongIds.length === 0;
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    // reset wartości — żeby ponowny wybór tego samego pliku też trigger'ował change
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = parseProgress(text);
+      if (parsed) onImport(parsed);
+      else onImportError();
+    } catch {
+      onImportError();
+    }
+  };
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
@@ -57,6 +85,36 @@ export default function Dashboard({ appState, onStartMode }: Props) {
           Postęp wg kategorii
         </h2>
         <CategoryBreakdown questionStats={questionStats} />
+      </section>
+
+      <section className="mt-8 border-t border-border pt-6">
+        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
+          Backup
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={onExport}
+            className="rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2"
+          >
+            Eksportuj JSON
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2"
+          >
+            Importuj JSON
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleFile}
+            hidden
+          />
+        </div>
+        <p className="mt-2 text-xs text-text-muted">
+          Eksport zapisze backup statystyk i powtórek do pliku. Import nadpisze obecny postęp (poprosi o potwierdzenie).
+        </p>
       </section>
     </main>
   );
