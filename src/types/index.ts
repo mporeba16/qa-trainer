@@ -9,7 +9,8 @@ export type Category =
   | 'web'
   | 'tools'
   | 'design'
-  | 'soft';
+  | 'soft'
+  | 'mobile';
 
 export type Question = {
   id: number;

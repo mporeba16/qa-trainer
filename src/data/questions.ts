@@ -32,6 +32,7 @@ export const CATEGORIES: Record<Category, string> = {
   tools: 'Postman/Charles',
   design: 'Test Design',
   soft: 'Soft Skills',
+  mobile: 'Mobile Testing',
 };
 
 export const QUESTIONS: Question[] = [
@@ -1133,6 +1134,436 @@ export const QUESTIONS: Question[] = [
     ],
     correct: 1,
     expl: '**503 Service Unavailable** - serwer celowo zwraca błąd: maintenance, overload, planowany downtime. Często z `Retry-After`. **504 Gateway Timeout** - gateway/proxy czekał na upstream zbyt długo, dostał timeout. Backend prawdopodobnie wolno działa lub padł.'
+  },
+
+  // ===== DEFEKTY (rozszerzenie) =====
+  {
+    id: 91, cat: 'defects',
+    q: 'Czym różni się "severity" od "priority"?',
+    a: [
+      'To synonimy',
+      'Severity = techniczny wpływ na system, priority = pilność naprawy z perspektywy biznesu',
+      'Severity ustala dev, priority QA',
+      'Priority dotyczy tylko backendu'
+    ],
+    correct: 1,
+    expl: '**Severity** (poważność) opisuje techniczny wpływ defektu. **Priority** (priorytet) określa pilność naprawy z perspektywy biznesu/użytkownika. Wysoka severity ≠ wysoki priority (np. crash w mało używanej feature może mieć niski priority).'
+  },
+  {
+    id: 92, cat: 'defects',
+    q: 'Czym jest defect leakage?',
+    a: [
+      'Przeciek poufnych defektów na zewnątrz',
+      'Defekt znaleziony w produkcji, który powinien zostać złapany w testach',
+      'Wyciek pamięci w aplikacji',
+      'Defekt powstały i znaleziony w jednej fazie'
+    ],
+    correct: 1,
+    expl: 'Defect leakage = defekt, który "wymknął się" z fazy testowej do produkcji (lub z testów jednostkowych do integracyjnych). To KPI mierzące skuteczność procesu QA — im niższy, tym lepiej.'
+  },
+  {
+    id: 93, cat: 'defects',
+    q: 'Co oznacza retest (confirmation testing)?',
+    a: [
+      'Powtórzenie scenariusza, który ujawnił defekt, po jego naprawie — żeby potwierdzić fix',
+      'Testowanie tego samego co wcześniej, bez powodu',
+      'Test wykonany ponownie przez innego testera',
+      'Smoke test'
+    ],
+    correct: 0,
+    expl: '**Retest** = wykonanie scenariusza ujawniającego defekt, po jego naprawie, aby potwierdzić rozwiązanie. To NIE to samo co regression testing, który sprawdza, czy fix nie zepsuł innych obszarów aplikacji.'
+  },
+  {
+    id: 94, cat: 'defects',
+    q: 'Defekt o priorytecie "blocker" oznacza:',
+    a: [
+      'Drobny błąd kosmetyczny',
+      'Bug uniemożliwiający kontynuację testów lub wydanie produktu — wymaga natychmiastowej naprawy',
+      'Defekt znaleziony w nocy',
+      'Bug zgłoszony przez VIP klienta'
+    ],
+    correct: 1,
+    expl: '**Blocker** = najwyższy priorytet. Bez naprawy nie ma jak kontynuować testów lub wypuścić release. Showstopper to często używany synonim. Wymaga drop-everything reakcji zespołu.'
+  },
+  {
+    id: 95, cat: 'defects',
+    q: 'Co powinno znaleźć się w dobrym bug reporcie?',
+    a: [
+      'Tylko tytuł i screenshot',
+      'Kroki reprodukcji, oczekiwane vs aktualne zachowanie, środowisko (OS/browser/wersja), severity/priority',
+      'Sugerowana implementacja fix-a w kodzie',
+      'Tylko opis emocjonalny problemu'
+    ],
+    correct: 1,
+    expl: 'Minimum dobrego bug reportu: jasny tytuł, kroki reprodukcji, oczekiwane vs aktualne zachowanie, środowisko, severity/priority. Sugerowanie implementacji fix-a wykracza poza odpowiedzialność testera — dostarczasz informację o problemie, nie projekt rozwiązania.'
+  },
+  {
+    id: 96, cat: 'defects',
+    q: 'Status "Won\'t fix" w bug trackerze oznacza:',
+    a: [
+      'Bug zostanie naprawiony za chwilę',
+      'Świadoma decyzja, że defekt nie zostanie naprawiony (niski wpływ vs koszt, zmiana scope-u, "feature not bug")',
+      'Bug technicznie niemożliwy do naprawy',
+      'Bug został usunięty z systemu'
+    ],
+    correct: 1,
+    expl: '**Won\'t fix** = świadoma decyzja zespołu/PM, że problemu nie naprawiamy. Powody: niski priority, wysoki koszt, planowana zmiana architektury, uznanie "feature, not bug". Defekt pozostaje w trackerze dla historii.'
+  },
+  {
+    id: 97, cat: 'defects',
+    q: 'Bug triage to:',
+    a: [
+      'Sortowanie defektów alfabetycznie',
+      'Regularne spotkanie, na którym klasyfikuje się nowe defekty: severity, priority, przypisanie, decyzja o włączeniu do sprintu',
+      'Automatyczne usuwanie duplikatów',
+      'Testowanie po naprawie'
+    ],
+    correct: 1,
+    expl: 'Bug triage = regularne (często codzienne lub cotygodniowe) spotkanie z udziałem PM, lead, QA, ew. devów. Cele: klasyfikacja nowych zgłoszeń, deduplikacja, decyzje o włączeniu do najbliższego release.'
+  },
+  {
+    id: 98, cat: 'defects',
+    q: 'Tytuł bug reportu "Nie działa zapisywanie" jest:',
+    a: [
+      'Dobry — krótki i konkretny',
+      'Zły — brak kontekstu (gdzie, kiedy, jak się manifestuje, na czym)',
+      'Idealny',
+      'Zależy od projektu'
+    ],
+    correct: 1,
+    expl: 'Dobry tytuł zawiera: GDZIE (komponent/screen), CO (akcja), JAK się manifestuje (crash/błąd/brak feedback). Przykład: "[Profil][iOS 17] Klik Save w edycji profilu zwraca 500 i nie zapisuje danych".'
+  },
+
+  // ===== SOFT SKILLS (rozszerzenie) =====
+  {
+    id: 99, cat: 'soft',
+    q: 'Klient zgłasza krytyczny bug w produkcji 5 minut przed Twoim wyjściem w piątek. Co robisz?',
+    a: [
+      'Wychodzę — bug poczeka do poniedziałku',
+      'Zostaję sam i pracuję 8h żeby naprawić',
+      'Reportuję ze szczegółami (severity, repro, impact), eskaluję do dyżurnego/oncall lub managera, pomagam w investigation, ale nie podejmuję sam decyzji o rollbacku',
+      'Mówię klientowi że to wina developerów'
+    ],
+    correct: 2,
+    expl: 'QA nie podejmuje sam decyzji produkcyjnych typu rollback. Dostarczasz info (bug report z severity i repro), eskalujesz przez właściwy kanał (oncall, manager), pomagasz reproducować/diagnozować. Decyzje należą do lead/manager.'
+  },
+  {
+    id: 100, cat: 'soft',
+    q: 'Masz 3 dni do release, znalazłeś 20 bugów: 1 blocker, 5 high, 14 low. Co priorytetyzujesz?',
+    a: [
+      'Wszystkie po kolei od najstarszego',
+      'Najpierw blocker, potem high — eskaluj do PM jeśli high nie zdążą; low udokumentuj i przenieś do następnego sprintu',
+      'Tylko najnowsze',
+      'Niczego nie zgłaszam, sam naprawiam'
+    ],
+    correct: 1,
+    expl: 'Priorytet = wpływ na release. Blocker MUSI być naprawiony. High zwykle też (negocjuj z PM jeśli grozi ślizganiem terminu). Low można przesunąć z udokumentowaniem. Komunikuj jasno co zdąży, a co nie.'
+  },
+  {
+    id: 101, cat: 'soft',
+    q: 'Dev twierdzi "u mnie działa". Co teraz?',
+    a: [
+      'Kłócę się że to jego wina',
+      'Rezygnuję z bug reportu',
+      'Sprawdzam różnice środowiska (OS, browser, dane, wersja), nagrywam video, dołączam logi, robię pair debugging — ułatwiam reprodukcję u niego',
+      'Eskaluje do CTO'
+    ],
+    correct: 2,
+    expl: '"Nie reprodukuje się" zwykle = różnica w środowisku, danych testowych, wersji buildu lub stanie. QA pomaga zdiagnozować: dokładne kroki, dane testowe, video, console logs, browser/OS info. Pair debugging często rozwiązuje w 15 min.'
+  },
+  {
+    id: 102, cat: 'soft',
+    q: 'Manager pyta "ile testów jeszcze zostało?" Co odpowiadasz?',
+    a: [
+      'Dużo',
+      'Konkretne liczby: wykonane/zaplanowane, znalezione bugi z severity, oszacowany czas pozostały, ryzyka blokujące',
+      'Skończyłem',
+      'Zapytaj zespół'
+    ],
+    correct: 1,
+    expl: 'Manager potrzebuje danych do decyzji. Daj: progress (15/30 case-ów), ryzyka (3 high bugi w fixie), ETA, blokery. Konkrety > "dużo"/"kilka". To podstawa do planowania release-u i komunikacji z biznesem.'
+  },
+  {
+    id: 103, cat: 'soft',
+    q: 'Na rozmowie pytają cię o słabe strony. Najgorsza odpowiedź:',
+    a: [
+      'Konkretna realna słabość + plan rozwoju',
+      '"Jestem perfekcjonistą / za bardzo się angażuję" — generyczne, brzmi nieszczerze',
+      'Przykład z konkretnego projektu',
+      'Przyznanie się do luki technicznej z planem nauki'
+    ],
+    correct: 1,
+    expl: 'Generyczne "słabości" typu "perfekcjonizm" są red flagiem — pokazują brak samoświadomości. Lepsze: realna luka (np. "automatyzacja w Cypress") + co z tym robisz (kurs, mentor, side project). Pokazuje refleksję i action bias.'
+  },
+  {
+    id: 104, cat: 'soft',
+    q: 'Czym dla ciebie różni się QA od testera?',
+    a: [
+      'To synonimy',
+      'QA = szerokie podejście do jakości procesu (prevention, requirements review, automation, mentoring). Tester = wykonywanie konkretnych testów',
+      'QA programuje, tester nie',
+      'QA zarabia więcej'
+    ],
+    correct: 1,
+    expl: '**Quality Assurance** to dyscyplina szersza: procesy, prewencja defektów, review wymagań, strategia testów, mentoring. **Tester** to rola wykonująca konkretną aktywność. W praktyce się przeplatają — ale na rozmowie warto pokazać tę różnicę i swoją pozycję na spektrum.'
+  },
+  {
+    id: 105, cat: 'soft',
+    q: 'Jaki jest najczęstszy błąd w komunikacji bug reportu?',
+    a: [
+      'Zbyt techniczny język',
+      'Brak konkretnych kroków reprodukcji, danych testowych i kontekstu — dev musi zgadywać',
+      'Pisanie po polsku',
+      'Używanie screenshotów'
+    ],
+    correct: 1,
+    expl: 'Najwięcej tarcia powstaje gdy dev musi zgadywać "jak ty to zrobiłeś". Konkretne kroki (kliknij X, wpisz Y), dane testowe (user: foo@bar.com), screenshot/video, env (browser, OS, wersja) — eliminują 80% pytań zwrotnych i ping-pongu.'
+  },
+
+  // ===== TEST DESIGN (rozszerzenie) =====
+  {
+    id: 106, cat: 'design',
+    q: 'Czym są równoważne klasy (equivalence partitioning)?',
+    a: [
+      'Podział danych wejściowych na grupy, w których system zachowuje się tak samo — wystarczy test z każdej grupy',
+      'Klasy w kodzie obiektowym',
+      'Klasy ekwiwalencji w matematyce',
+      'Grupowanie testerów po doświadczeniu'
+    ],
+    correct: 0,
+    expl: '**Equivalence partitioning** to technika czarnoskrzynkowa: dzielisz dane wejściowe na partycje (np. wiek <18, 18-65, >65), w których system zachowuje się jednakowo. Testujesz jedną reprezentatywną wartość z każdej partycji zamiast wszystkich.'
+  },
+  {
+    id: 107, cat: 'design',
+    q: 'Boundary Value Analysis (BVA) testuje:',
+    a: [
+      'Wszystkie możliwe wartości',
+      'Granice partycji + wartości tuż obok (np. dla granicy 18: 17, 18, 19)',
+      'Tylko wartości typowe',
+      'Tylko wartości negatywne'
+    ],
+    correct: 1,
+    expl: '**BVA** opiera się na obserwacji, że bugi często siedzą na granicach (off-by-one, `<=` vs `<`). Testuje wartość graniczną + jeden poniżej + jeden powyżej. Dla zakresu 1-100: 0, 1, 2, 99, 100, 101. Komplementarne z equivalence partitioning.'
+  },
+  {
+    id: 108, cat: 'design',
+    q: 'Decision table testing najbardziej się przydaje gdy:',
+    a: [
+      'Jest jedna prosta reguła',
+      'Logika zależy od kombinacji wielu warunków (np. rabaty zależne od typu klienta + kwoty + sezonu)',
+      'Testujemy wydajność',
+      'Testujemy UI'
+    ],
+    correct: 1,
+    expl: '**Tabela decyzyjna** systematycznie pokrywa kombinacje warunków → akcji. Idealna do reguł biznesowych: rabaty, uprawnienia, walidacje wielowarunkowe. Pomaga znaleźć luki i sprzeczności w specyfikacji jeszcze przed kodowaniem.'
+  },
+  {
+    id: 109, cat: 'design',
+    q: 'State transition testing dotyczy:',
+    a: [
+      'Migracji bazy danych',
+      'Przejść między stanami systemu (np. Order: Created → Paid → Shipped) i prób nieprawidłowych przejść',
+      'Tylko backendu',
+      'Tylko frontendu'
+    ],
+    correct: 1,
+    expl: 'Państwa-przejścia (state-transition) testuje system z dyskretnymi stanami. Sprawdza: prawidłowe przejścia (Created → Paid ✓), nieprawidłowe (Shipped → Paid ✗), akcje w każdym stanie, edge case (Paid przy braku produktu).'
+  },
+  {
+    id: 110, cat: 'design',
+    q: 'Testowanie eksploracyjne to:',
+    a: [
+      'Bezmyślne klikanie po aplikacji',
+      'Symultaniczne projektowanie, wykonywanie i uczenie się o systemie — testy bez wcześniej spisanego skryptu, ale z celem',
+      'Test, który zawsze przechodzi',
+      'Test wymyślony przez biznes'
+    ],
+    correct: 1,
+    expl: '**Exploratory testing** = świadome odkrywanie systemu z uczeniem się i jednoczesnym testowaniem. Tester ma cel ("sprawdź payment flow 90 min"), używa charters/test ideas, ale bez sztywnego skryptu. Często znajduje bugi pomijane przez scripted testy.'
+  },
+
+  // ===== TOOLS (rozszerzenie) =====
+  {
+    id: 111, cat: 'tools',
+    q: 'W Postmanie kolekcje pozwalają:',
+    a: [
+      'Tylko zapisać requesty',
+      'Grupować requesty, dzielić środowiska (env), uruchamiać sekwencyjnie z testami (Runner), eksportować do CI przez Newman',
+      'Tylko podpisać requesty cyfrowo',
+      'Mockować bazy danych'
+    ],
+    correct: 1,
+    expl: 'Kolekcje w Postman to potężny grouping mechanism. Mają: zmienne środowiskowe (dev/staging/prod), pre-request scripts, test scripts, Runner do sekwencyjnego wykonywania z danymi z CSV/JSON, eksport do **Newman** (CLI do CI/CD).'
+  },
+  {
+    id: 112, cat: 'tools',
+    q: 'Selenium WebDriver służy do:',
+    a: [
+      'Testowania REST API',
+      'Automatyzacji interakcji z przeglądarką (klikanie, wpisywanie, czytanie DOM) — standard W3C',
+      'Testowania wydajności',
+      'Mockowania serwerów'
+    ],
+    correct: 1,
+    expl: '**Selenium WebDriver** to standard W3C dla automatyzacji przeglądarek. Każdy major browser ma driver (ChromeDriver, GeckoDriver). Komunikacja przez protokół, nie obrazowo jak macro. Wspiera multi-browser, ale jest bardziej "low-level" niż Cypress/Playwright.'
+  },
+  {
+    id: 113, cat: 'tools',
+    q: 'Page Object Model (POM) w automatyzacji UI to:',
+    a: [
+      'Wzorzec: każda strona ma osobną klasę z lokatorami i metodami; testy używają abstrakcji zamiast surowych selektorów',
+      'Narzędzie wbudowane w Selenium',
+      'Biblioteka do generowania PDFów',
+      'Framework do API testów'
+    ],
+    correct: 0,
+    expl: '**POM** separuje WHAT (test scenario) od HOW (jak kliknąć przycisk). Strona = klasa z lokatorami + akcjami. Test mówi `loginPage.login(user, pass)`. Gdy UI się zmienia, naprawiasz tylko klasę strony, nie każdy test. Klasyczny wzorzec, ale bywa krytykowany za boilerplate.'
+  },
+  {
+    id: 114, cat: 'tools',
+    q: 'Charles Proxy (i podobne: mitmproxy, Proxyman) służy do:',
+    a: [
+      'Przechwytywania, oglądania i modyfikowania ruchu HTTP/HTTPS między klientem a serwerem',
+      'Tylko generowania ruchu',
+      'Edycji baz danych',
+      'Statycznej analizy kodu'
+    ],
+    correct: 0,
+    expl: '**Charles** działa jako proxy man-in-the-middle. Pozwala: oglądać requesty/responses, modyfikować je w locie (Rewrite), symulować slow network (Throttling), breakpoint na request. Niezbędne do debugowania mobile / SPA. Wymaga zaufanego certyfikatu CA na urządzeniu.'
+  },
+  {
+    id: 115, cat: 'tools',
+    q: 'Cypress różni się od Selenium głównie tym, że:',
+    a: [
+      'Działa wyłącznie z Chrome',
+      'Wykonuje testy bezpośrednio w przeglądarce (w tym samym procesie co aplikacja), ma automatyczne czekanie na elementy, time-travel debugger',
+      'Testuje tylko API',
+      'Wymaga osobnego serwera'
+    ],
+    correct: 1,
+    expl: '**Cypress** to nowoczesne narzędzie — testy live w przeglądarce, automatic retry/wait, time-travel debugger, snapshot każdego kroku, lepszy DX. Wspiera Chrome, Firefox, Edge, WebKit. **Selenium** wygrywa w multi-browser i obsłudze wielu kart/okien (Cypress przez długi czas miał ograniczenia).'
+  },
+
+  // ===== MOBILE TESTING (nowa kategoria) =====
+  {
+    id: 116, cat: 'mobile',
+    q: 'ADB (Android Debug Bridge) służy do:',
+    a: [
+      'Tylko instalacji APK',
+      'Komunikacji z urządzeniem Android: instalacja APK, dostęp do shell, logi (logcat), pull/push plików, debugowanie',
+      'Tylko czytania logów',
+      'Tylko emulatorów, nie urządzeń fizycznych'
+    ],
+    correct: 1,
+    expl: '`adb` to CLI do komunikacji z dowolnym Android device (USB lub emulator). Kluczowe komendy: `adb install/uninstall`, `adb logcat`, `adb shell`, `adb pull/push`, `adb devices`. Działa zarówno z fizycznymi urządzeniami (USB debugging), jak i emulatorami.'
+  },
+  {
+    id: 117, cat: 'mobile',
+    q: 'Najważniejsza różnica między emulatorem a urządzeniem fizycznym:',
+    a: [
+      'Nie ma różnicy',
+      'Emulator pomija real-world faktory: bateria, sieć (3G/LTE/Wi-Fi switching), GPU, kamera, czujniki, gestures, fragmentacja OEM-ów (Samsung One UI vs stock vs Xiaomi MIUI)',
+      'Emulator jest dokładniejszy',
+      'Tylko emulator obsługuje root'
+    ],
+    correct: 1,
+    expl: 'Emulator dobry do szybkiej iteracji w devie. Ale przed release MUSISZ przetestować na realnych urządzeniach: różne rozdzielczości, OEM-y z customowymi launcherami, słabsze GPU, niskie RAM, bateria, kamera, czujniki, prawdziwe touch gestures.'
+  },
+  {
+    id: 118, cat: 'mobile',
+    q: 'Co testujesz dla permission flow na Androidzie?',
+    a: [
+      'Tylko sukces flow',
+      'Akceptację, odmowę, "deny + don\'t ask again", revoke z systemu po zaakceptowaniu, runtime permissions vs install-time, downgrade po update',
+      'Tylko pierwsze uruchomienie',
+      'Nic — to robi system'
+    ],
+    correct: 1,
+    expl: 'Permission flow ma wiele stanów: zgoda → cofnięcie z Settings (czy app crashuje?), odmowa → "don\'t ask again" (czy graceful?), permission revoke gdy app w tle (np. zmiana w innej apce), downgrade po update. Każdy stan wymaga testu.'
+  },
+  {
+    id: 119, cat: 'mobile',
+    q: 'Co to "deep link" w aplikacji mobilnej?',
+    a: [
+      'Link do bardzo zagłębionej strony w sitemap',
+      'Link, który otwiera konkretny ekran w aplikacji (np. myapp://product/123 lub uniwersalny https://app.com/product/123)',
+      'Link tylko dla admina',
+      'Hyperlink w PDF'
+    ],
+    correct: 1,
+    expl: '**Deep link** otwiera konkretny widok w app, zamiast tylko home screen. Testuj: link z nieuruchomioną aplikacją (kontekst zachowany?), link gdy nie zainstalowana (fallback do store?), Android App Links vs custom scheme, link z różnych źródeł (email, push, web).'
+  },
+  {
+    id: 120, cat: 'mobile',
+    q: 'Co testować przy zmianie orientacji ekranu (portrait ↔ landscape)?',
+    a: [
+      'Nic szczególnego',
+      'Zachowanie stanu (wpisane dane formularza, scroll position, video playback, otwarte dialogi), brak crashu/freeze',
+      'Tylko czy obrazek się skaluje',
+      'Tylko czy klawiatura się chowa'
+    ],
+    correct: 1,
+    expl: 'Zmiana orientacji = Activity recreate na Androidzie (domyślnie). Klasyczne miejsca bugów: utracone wpisane dane formularza, scroll wraca na top, video resetuje się, dialog znika, focus przechodzi gdzie indziej. Wymaga `onSaveInstanceState` w kodzie.'
+  },
+  {
+    id: 121, cat: 'mobile',
+    q: 'Push notifications — co najczęściej testuje QA?',
+    a: [
+      'Tylko że przyszły',
+      'Dostarczenie w różnych stanach (foreground/background/killed), deep link z notyfikacji, action buttons, badge count, system-level disable, group notifications',
+      'Tylko ikonę',
+      'Czas dostarczenia'
+    ],
+    correct: 1,
+    expl: 'Push to złożona feature — różny handler dla każdego stanu app. Testuj: foreground vs background vs killed, action buttons, deep link z notyfikacji, expanded vs collapsed view, group notifications, system-level disabled (czy app graceful?), rich media (image/video).'
+  },
+  {
+    id: 122, cat: 'mobile',
+    q: 'Crash reporting w mobile QA — popularne narzędzia to:',
+    a: [
+      'Tylko console.log',
+      'Firebase Crashlytics, Sentry, Bugsnag, Instabug — zbierają stack trace, device info, breadcrumbs prowadzące do crashu',
+      'Excel',
+      'Tylko Logcat (Android Studio)'
+    ],
+    correct: 1,
+    expl: 'Crash reporting agreguje crashe od prawdziwych użytkowników. **Crashlytics** (najpopularniejszy, free, część Firebase), **Sentry** (poza Google ekosystem), **Bugsnag**. Zbierają stack trace, OS/device info, custom logs (breadcrumbs). QA monitoruje po release i prioritetyzuje fixe.'
+  },
+  {
+    id: 123, cat: 'mobile',
+    q: 'Jak symulować słabe połączenie sieciowe na iOS?',
+    a: [
+      'Nie da się',
+      'Settings → Developer → Network Link Conditioner (presety: 3G, Edge, Very Bad Network, 100% Loss) lub Charles Proxy z throttlingiem',
+      'Wyłączyć Wi-Fi',
+      'Tylko na real device'
+    ],
+    correct: 1,
+    expl: 'iOS ma wbudowany **Network Link Conditioner** (Settings → Developer): presety dla 3G, Edge, Very Bad Network, Lossy, 100% Loss. Charles/Proxyman też mają throttling. Testuj: long loading states, timeout handling, offline mode, retry logic, request cancellation przy zmianie sieci.'
+  },
+  {
+    id: 124, cat: 'mobile',
+    q: 'scrcpy to narzędzie do:',
+    a: [
+      'Skanowania portów',
+      'Mirrorowania ekranu Android z komputera + sterowanie myszą/klawiaturą (przez ADB) — przydatne do demo, bug reportów, nagrywania sesji',
+      'Edycji XML layoutów',
+      'Statycznej analizy APK'
+    ],
+    correct: 1,
+    expl: '`scrcpy` mirroruje ekran Androida na desktop przez ADB (open-source). Możesz sterować myszą/klawiaturą laptopa, nagrywać sesje, robić wide screenshot. Super do live demo bugów na call, presentation, prep na rozmowy. Nie wymaga roota.'
+  },
+  {
+    id: 125, cat: 'mobile',
+    q: 'App size i cold start time — dlaczego ważne dla QA?',
+    a: [
+      'Nie są ważne',
+      'Wpływają na konwersję (porzucenia pobierania) i UX. Sklepy ostrzegają o appkach >150 MB, cold start <2s to wartość docelowa dla dobrego UX',
+      'Tylko dla developerów',
+      'Tylko na iOS'
+    ],
+    correct: 1,
+    expl: 'Rozmiar APK/IPA wpływa na install rate (>150 MB na cell network = duża rezygnacja). **Cold start** (z killed) to first impression — >3s frustruje, >5s = ludzie zamykają. QA monitoruje metryki przez build pipeline (size diff per PR) i performance testing na słabszych urządzeniach.'
   }
 ];
 
