@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback: każda nieznana ścieżka serwuje index.html (status 200, nie redirect).
+# Bez tego refresh na podstronie (gdy kiedyś dodasz routing) zwróciłby 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
