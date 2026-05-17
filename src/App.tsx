@@ -12,8 +12,14 @@ import { DEFAULT_APP_STATE } from './types';
 import { stateKeyForCert } from './data';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useTheme } from './hooks/useTheme';
+import { useAuth } from './hooks/useAuth';
 import { shuffle } from './utils/shuffle';
 import { exportProgress } from './utils/progressIO';
+import {
+  fetchCloudState,
+  uploadCloudState,
+  mergeAppStates,
+} from './utils/syncState';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
 import QuizSetup from './components/QuizSetup';
@@ -24,9 +30,11 @@ import Timer from './components/Timer';
 import ConfirmModal from './components/ConfirmModal';
 import Toast from './components/Toast';
 import InstallPrompt from './components/InstallPrompt';
+import LoginModal from './components/LoginModal';
 
 const REVIEW_MAX = 30;
 const TOAST_MS = 3000;
+const SYNC_DEBOUNCE_MS = 1500;
 
 type ToastState = { message: string; type: 'success' | 'danger' };
 
@@ -42,6 +50,12 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     DEFAULT_APP_STATE,
   );
   const { theme, toggleTheme } = useTheme();
+  const {
+    user,
+    enabled: authEnabled,
+    signInWithMagicLink,
+    signOut,
+  } = useAuth();
 
   const [view, setView] = useState<View>('home');
   const [pendingMode, setPendingMode] = useState<QuizMode | null>(null);
@@ -51,6 +65,12 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   const [pendingImport, setPendingImport] = useState<AppState | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimerRef = useRef<number | null>(null);
+
+  // Auth/sync state
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [synced, setSynced] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const initialSyncRanRef = useRef(false);
 
   const showToast = (message: string, type: 'success' | 'danger' = 'success') => {
     if (toastTimerRef.current !== null) {
@@ -71,6 +91,62 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       }
     };
   }, []);
+
+  // --- Sync: initial fetch + merge (jednorazowy per cert mount, gdy user jest zalogowany)
+  useEffect(() => {
+    if (!user || initialSyncRanRef.current) return;
+    initialSyncRanRef.current = true;
+    let cancelled = false;
+    setSyncing(true);
+
+    (async () => {
+      const cloud = await fetchCloudState(user.id, cert.id);
+      if (cancelled) return;
+      const merged = mergeAppStates(cloud, appState);
+      setAppState(merged);
+      await uploadCloudState(user.id, cert.id, merged);
+      if (cancelled) return;
+      setSynced(true);
+      setSyncing(false);
+      if (cloud) {
+        showToast(`Pobrano postęp z chmury (${merged.stats.totalAnswered} odp.)`);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // celowo bez appState — initial sync ma sie odpalic raz po login, nie po kazdej zmianie
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, cert.id]);
+
+  // --- Sync: debounced upload przy zmianie stanu (gdy zalogowany i po initial sync)
+  useEffect(() => {
+    if (!user || !synced) return;
+    setSyncing(true);
+    const t = window.setTimeout(() => {
+      uploadCloudState(user.id, cert.id, appState).finally(() => setSyncing(false));
+    }, SYNC_DEBOUNCE_MS);
+    return () => {
+      window.clearTimeout(t);
+      setSyncing(false);
+    };
+  }, [user, synced, cert.id, appState]);
+
+  // --- Reset sync state przy wylogowaniu (next login = re-init)
+  useEffect(() => {
+    if (!user) {
+      initialSyncRanRef.current = false;
+      setSynced(false);
+      setSyncing(false);
+    }
+  }, [user]);
+
+  // --- Auth handlery
+  const handleLogout = async () => {
+    await signOut();
+    showToast('Wylogowano');
+  };
 
   // --- Start ---
   const startMode = (mode: QuizMode) => {
@@ -356,6 +432,11 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         theme={theme}
         onToggleTheme={toggleTheme}
         onReset={() => setResetOpen(true)}
+        authEnabled={authEnabled}
+        user={user}
+        syncing={syncing}
+        onLoginClick={() => setLoginOpen(true)}
+        onLogout={handleLogout}
       />
 
       <InstallPrompt />
@@ -480,6 +561,12 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         danger
         onConfirm={confirmImport}
         onCancel={() => setPendingImport(null)}
+      />
+
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSubmit={signInWithMagicLink}
       />
 
       {toast && (

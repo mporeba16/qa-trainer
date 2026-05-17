@@ -1,3 +1,4 @@
+import type { User } from '@supabase/supabase-js';
 import type { Cert, Theme } from '../types';
 
 type Props = {
@@ -7,6 +8,12 @@ type Props = {
   theme: Theme;
   onToggleTheme: () => void;
   onReset: () => void;
+  // auth (opcjonalne — gdy Supabase nie skonfigurowany, hide login UI)
+  authEnabled: boolean;
+  user: User | null;
+  syncing: boolean;
+  onLoginClick: () => void;
+  onLogout: () => void;
 };
 
 export default function Header({
@@ -16,6 +23,11 @@ export default function Header({
   theme,
   onToggleTheme,
   onReset,
+  authEnabled,
+  user,
+  syncing,
+  onLoginClick,
+  onLogout,
 }: Props) {
   return (
     <header className="border-b border-border bg-surface">
@@ -39,7 +51,32 @@ export default function Header({
             </select>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {authEnabled && user && (
+            <span
+              className="hidden max-w-[160px] truncate font-mono text-xs text-text-muted sm:inline"
+              title={user.email ?? ''}
+            >
+              {user.email}
+              {syncing && <span className="ml-2 text-accent">●</span>}
+            </span>
+          )}
+          {authEnabled && !user && (
+            <button
+              onClick={onLoginClick}
+              className="rounded-md border border-accent bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent hover:bg-accent hover:text-white"
+            >
+              Zaloguj
+            </button>
+          )}
+          {authEnabled && user && (
+            <button
+              onClick={onLogout}
+              className="rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-text hover:bg-surface-2"
+            >
+              Wyloguj
+            </button>
+          )}
           <button
             onClick={onToggleTheme}
             aria-label="Przełącz motyw"
