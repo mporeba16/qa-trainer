@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { Question } from '../types';
-import { CATEGORIES } from '../data/questions';
 
 type Props = {
   question: Question;
+  categoryLabel: string;
   currentIdx: number;
   total: number;
   onRate: (knew: boolean) => void;
@@ -12,6 +12,7 @@ type Props = {
 
 export default function Flashcard({
   question,
+  categoryLabel,
   currentIdx,
   total,
   onRate,
@@ -72,7 +73,7 @@ export default function Flashcard({
 
       <article className="rounded-lg border border-border bg-surface p-6">
         <div className="text-xs font-medium uppercase tracking-wide text-text-muted">
-          {CATEGORIES[question.cat]}
+          {categoryLabel}
         </div>
         <h2 className="mt-2 text-lg font-semibold leading-snug text-text sm:text-xl">
           {question.q}

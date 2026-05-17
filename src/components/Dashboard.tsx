@@ -1,5 +1,5 @@
 import { useRef, type ChangeEvent } from 'react';
-import type { AppState, QuizMode } from '../types';
+import type { AppState, Cert, QuizMode } from '../types';
 import { parseProgress } from '../utils/progressIO';
 import { formatDuration } from '../utils/format';
 import CategoryBreakdown from './CategoryBreakdown';
@@ -7,6 +7,7 @@ import ProgressChart from './ProgressChart';
 
 type Props = {
   appState: AppState;
+  cert: Cert;
   onStartMode: (mode: QuizMode) => void;
   onExport: () => void;
   onImport: (state: AppState) => void;
@@ -15,6 +16,7 @@ type Props = {
 
 export default function Dashboard({
   appState,
+  cert,
   onStartMode,
   onExport,
   onImport,
@@ -83,7 +85,7 @@ export default function Dashboard({
         />
         <ModeCard
           title="Egzamin"
-          description="40 pytań, 60 min, próg 65%. Bez podpowiedzi w trakcie."
+          description={`${cert.examCount} pytań, ${Math.round(cert.examDurationSec / 60)} min, próg ${cert.examPassPct}%. Bez podpowiedzi w trakcie.`}
           actionLabel="Egzamin"
           onClick={() => onStartMode('exam')}
         />
@@ -98,9 +100,13 @@ export default function Dashboard({
 
       <section className="mt-8">
         <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
-          Postęp wg kategorii
+          Postęp wg kategorii ({cert.shortName})
         </h2>
-        <CategoryBreakdown questionStats={questionStats} />
+        <CategoryBreakdown
+          questionStats={questionStats}
+          categories={cert.categories}
+          questions={cert.questions}
+        />
       </section>
 
       <section className="mt-8 border-t border-border pt-6">

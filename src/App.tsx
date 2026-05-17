@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type {
   AppState,
+  Cert,
   QuizMode,
   SessionRecord,
   SessionState,
@@ -8,7 +9,7 @@ import type {
   View,
 } from './types';
 import { DEFAULT_APP_STATE } from './types';
-import { QUESTIONS } from './data/questions';
+import { stateKeyForCert } from './data';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useTheme } from './hooks/useTheme';
 import { shuffle } from './utils/shuffle';
@@ -24,17 +25,20 @@ import ConfirmModal from './components/ConfirmModal';
 import Toast from './components/Toast';
 import InstallPrompt from './components/InstallPrompt';
 
-const EXAM_DURATION_SEC = 60 * 60;
-const EXAM_COUNT = 40;
-const EXAM_PASS = 65;
 const REVIEW_MAX = 30;
 const TOAST_MS = 3000;
 
 type ToastState = { message: string; type: 'success' | 'danger' };
 
-export default function App() {
+type Props = {
+  cert: Cert;
+  certs: Cert[];
+  onSwitchCert: (certId: string) => void;
+};
+
+export default function App({ cert, certs, onSwitchCert }: Props) {
   const [appState, setAppState] = useLocalStorage<AppState>(
-    'qa_trainer_v1',
+    stateKeyForCert(cert.id),
     DEFAULT_APP_STATE,
   );
   const { theme, toggleTheme } = useTheme();
@@ -71,7 +75,7 @@ export default function App() {
   // --- Start ---
   const startMode = (mode: QuizMode) => {
     if (mode === 'exam') {
-      beginQuiz('exam', { categories: [], count: EXAM_COUNT });
+      beginQuiz('exam', { categories: [], count: cert.examCount });
       return;
     }
     if (mode === 'review' && appState.wrongIds.length === 0) return;
@@ -82,14 +86,14 @@ export default function App() {
   const beginQuiz = (mode: QuizMode, config: SetupConfig) => {
     let pool;
     if (mode === 'review') {
-      pool = QUESTIONS.filter((q) => appState.wrongIds.includes(q.id));
+      pool = cert.questions.filter((q) => appState.wrongIds.includes(q.id));
     } else if (mode === 'exam') {
-      pool = QUESTIONS;
+      pool = cert.questions;
     } else {
       pool =
         config.categories.length === 0
-          ? QUESTIONS
-          : QUESTIONS.filter((q) => config.categories.includes(q.cat));
+          ? cert.questions
+          : cert.questions.filter((q) => config.categories.includes(q.cat));
     }
     const shuffled = shuffle(pool).slice(0, config.count);
     setSession({
@@ -187,7 +191,7 @@ export default function App() {
           s.questions.length === 0
             ? 0
             : (correctCount / s.questions.length) * 100;
-        const isExamPass = s.mode === 'exam' && pct >= EXAM_PASS;
+        const isExamPass = s.mode === 'exam' && pct >= cert.examPassPct;
         const newRecord: SessionRecord = {
           timestamp: endTime,
           mode: s.mode,
@@ -346,6 +350,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-bg text-text">
       <Header
+        cert={cert}
+        certs={certs}
+        onSwitchCert={onSwitchCert}
         theme={theme}
         onToggleTheme={toggleTheme}
         onReset={() => setResetOpen(true)}
@@ -356,6 +363,7 @@ export default function App() {
       {view === 'home' && (
         <Dashboard
           appState={appState}
+          cert={cert}
           onStartMode={startMode}
           onExport={handleExport}
           onImport={handleImportRequest}
@@ -366,6 +374,7 @@ export default function App() {
       {view === 'setup' && pendingMode && pendingMode !== 'exam' && (
         <QuizSetup
           mode={pendingMode}
+          cert={cert}
           wrongIdsCount={appState.wrongIds.length}
           onCancel={() => {
             setPendingMode(null);
@@ -378,6 +387,7 @@ export default function App() {
       {view === 'quiz' && session && session.mode === 'flashcards' && (
         <Flashcard
           question={session.questions[session.currentIdx]}
+          categoryLabel={cert.categories[session.questions[session.currentIdx].cat] ?? session.questions[session.currentIdx].cat}
           currentIdx={session.currentIdx}
           total={session.questions.length}
           onRate={rateFlashcard}
@@ -401,7 +411,7 @@ export default function App() {
             session.mode === 'exam' ? (
               <Timer
                 startTime={session.startTime}
-                durationSec={EXAM_DURATION_SEC}
+                durationSec={cert.examDurationSec}
                 onTimeUp={finishQuiz}
               />
             ) : null
@@ -412,6 +422,7 @@ export default function App() {
       {view === 'results' && session && (
         <QuizResults
           mode={session.mode}
+          examPassPct={cert.examPassPct}
           questions={session.questions}
           answers={session.answers}
           correctCount={session.correctCount}

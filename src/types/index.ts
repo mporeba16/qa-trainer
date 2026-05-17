@@ -1,16 +1,22 @@
 // Centralne typy aplikacji QA Trainer.
 // Jeśli dodajesz nowy stan/strukturę — najpierw tutaj.
 
-export type Category =
-  | 'istqb'
-  | 'defects'
-  | 'agile'
-  | 'api'
-  | 'web'
-  | 'tools'
-  | 'design'
-  | 'soft'
-  | 'mobile';
+// Category jest teraz luźnym stringiem — każda certyfikacja definiuje własny
+// zestaw kategorii w swoim obiekcie Cert. Walidacja per cert, nie per typ.
+export type Category = string;
+
+// Certyfikacja = paczka pytań + parametrów egzaminu. Trener może obsłużyć wiele
+// (np. ISTQB CTFL, CTAL-TA, AWS, ...). Stan postępu jest per cert (osobny klucz LS).
+export type Cert = {
+  id: string;          // np. 'istqb-ctfl', 'istqb-ctal-ta'
+  name: string;        // pełna nazwa wyświetlana
+  shortName: string;   // kompaktowa nazwa do switchera
+  categories: Record<string, string>; // klucz kategorii -> etykieta
+  questions: Question[];
+  examCount: number;       // pytań w trybie egzamin
+  examDurationSec: number; // czas egzaminu
+  examPassPct: number;     // próg zdania (%)
+};
 
 export type Question = {
   id: number;

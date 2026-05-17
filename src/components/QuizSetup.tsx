@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import type { Category, SetupConfig } from '../types';
-import { CATEGORIES, QUESTIONS } from '../data/questions';
+import type { Cert, SetupConfig } from '../types';
 
 type Props = {
   mode: 'practice' | 'review' | 'flashcards';
+  cert: Cert;
   wrongIdsCount: number;
   onCancel: () => void;
   onStart: (config: SetupConfig) => void;
@@ -18,24 +18,22 @@ const TITLES: Record<Props['mode'], string> = {
   flashcards: 'Fiszki',
 };
 
-export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Props) {
+export default function QuizSetup({ mode, cert, wrongIdsCount, onCancel, onStart }: Props) {
   const isReview = mode === 'review';
-  const [selectedCats, setSelectedCats] = useState<Category[]>([]);
+  const [selectedCats, setSelectedCats] = useState<string[]>([]);
   const [count, setCount] = useState<number>(10);
 
   // Ile pytań mamy faktycznie do dyspozycji dla aktualnych filtrów
   const availableCount = useMemo(() => {
     if (isReview) return Math.min(wrongIdsCount, REVIEW_MAX);
-    if (selectedCats.length === 0) return QUESTIONS.length;
-    return QUESTIONS.filter((q) => selectedCats.includes(q.cat)).length;
-  }, [isReview, wrongIdsCount, selectedCats]);
+    if (selectedCats.length === 0) return cert.questions.length;
+    return cert.questions.filter((q) => selectedCats.includes(q.cat)).length;
+  }, [isReview, wrongIdsCount, selectedCats, cert.questions]);
 
-  // Jeśli żadna z opcji COUNT_OPTIONS nie mieści się w dostępnych pytaniach
-  // (rzadki edge case dla review), zaproponuj "wszystkie".
   const showAllAvailable =
     availableCount > 0 && availableCount < COUNT_OPTIONS[0];
 
-  const toggleCat = (cat: Category) => {
+  const toggleCat = (cat: string) => {
     setSelectedCats((prev) =>
       prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat],
     );
@@ -48,6 +46,8 @@ export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Pr
       count: finalCount,
     });
   };
+
+  const catKeys = Object.keys(cert.categories);
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
@@ -73,7 +73,7 @@ export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Pr
             Kategorie
           </h2>
           <div className="flex flex-wrap gap-2">
-            {(Object.keys(CATEGORIES) as Category[]).map((cat) => {
+            {catKeys.map((cat) => {
               const active = selectedCats.includes(cat);
               return (
                 <button
@@ -85,7 +85,7 @@ export default function QuizSetup({ mode, wrongIdsCount, onCancel, onStart }: Pr
                       : 'rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-text hover:bg-surface-2'
                   }
                 >
-                  {CATEGORIES[cat]}
+                  {cert.categories[cat]}
                 </button>
               );
             })}

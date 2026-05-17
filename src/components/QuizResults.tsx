@@ -2,6 +2,7 @@ import type { Question, QuizMode } from '../types';
 
 type Props = {
   mode: QuizMode;
+  examPassPct: number;
   questions: Question[];
   answers: (number | null)[];
   correctCount: number;
@@ -12,10 +13,9 @@ type Props = {
   onHome: () => void;
 };
 
-const EXAM_PASS = 65;
-
 export default function QuizResults({
   mode,
+  examPassPct,
   questions,
   answers,
   correctCount,
@@ -27,7 +27,7 @@ export default function QuizResults({
   const total = questions.length;
   const pct = total === 0 ? 0 : Math.round((correctCount / total) * 100);
   const isExam = mode === 'exam';
-  const passed = isExam && pct >= EXAM_PASS;
+  const passed = isExam && pct >= examPassPct;
 
   const mm = Math.floor(timeSec / 60);
   const ss = timeSec % 60;
@@ -58,7 +58,7 @@ export default function QuizResults({
         </div>
         {isExam && (
           <div className="mt-1 text-xs text-text-muted">
-            Próg zdania: {EXAM_PASS}%
+            Próg zdania: {examPassPct}%
           </div>
         )}
       </section>
