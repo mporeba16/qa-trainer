@@ -22,6 +22,7 @@ import Flashcard from './components/Flashcard';
 import Timer from './components/Timer';
 import ConfirmModal from './components/ConfirmModal';
 import Toast from './components/Toast';
+import InstallPrompt from './components/InstallPrompt';
 
 const EXAM_DURATION_SEC = 60 * 60;
 const EXAM_COUNT = 40;
@@ -179,6 +180,8 @@ export default function App() {
           recordAnswer(q.id, isCorrect);
         });
       }
+      const endTime = Date.now();
+      const durationSec = Math.max(0, Math.floor((endTime - s.startTime) / 1000));
       setAppState((prev) => {
         const pct =
           s.questions.length === 0
@@ -186,7 +189,7 @@ export default function App() {
             : (correctCount / s.questions.length) * 100;
         const isExamPass = s.mode === 'exam' && pct >= EXAM_PASS;
         const newRecord: SessionRecord = {
-          timestamp: Date.now(),
+          timestamp: endTime,
           mode: s.mode,
           total: s.questions.length,
           correct: correctCount,
@@ -199,11 +202,12 @@ export default function App() {
             examsAttempted:
               prev.stats.examsAttempted + (s.mode === 'exam' ? 1 : 0),
             examsPassed: prev.stats.examsPassed + (isExamPass ? 1 : 0),
+            totalTimeSec: (prev.stats.totalTimeSec ?? 0) + durationSec,
           },
           sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
         };
       });
-      return { ...s, correctCount, wrongCount, endTime: Date.now() };
+      return { ...s, correctCount, wrongCount, endTime };
     });
     setView('results');
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -268,16 +272,22 @@ export default function App() {
 
     if (isLast) {
       // fiszki nie mają osobnego ekranu wyników — toast + powrót
+      const endTime = Date.now();
+      const durationSec = Math.max(0, Math.floor((endTime - session.startTime) / 1000));
       setAppState((prev) => {
         const newRecord: SessionRecord = {
-          timestamp: Date.now(),
+          timestamp: endTime,
           mode: 'flashcards',
           total: session.questions.length,
           correct: newCorrect,
         };
         return {
           ...prev,
-          stats: { ...prev.stats, sessions: prev.stats.sessions + 1 },
+          stats: {
+            ...prev.stats,
+            sessions: prev.stats.sessions + 1,
+            totalTimeSec: (prev.stats.totalTimeSec ?? 0) + durationSec,
+          },
           sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
         };
       });
@@ -340,6 +350,8 @@ export default function App() {
         onToggleTheme={toggleTheme}
         onReset={() => setResetOpen(true)}
       />
+
+      <InstallPrompt />
 
       {view === 'home' && (
         <Dashboard

@@ -35,6 +35,7 @@ export type GlobalStats = {
   sessions: number;
   examsAttempted: number;
   examsPassed: number;
+  totalTimeSec: number;
 };
 
 export type Theme = 'light' | 'dark';
@@ -87,6 +88,7 @@ export const DEFAULT_APP_STATE: AppState = {
     sessions: 0,
     examsAttempted: 0,
     examsPassed: 0,
+    totalTimeSec: 0,
   },
   questionStats: {},
   wrongIds: [],

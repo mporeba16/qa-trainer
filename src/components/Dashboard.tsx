@@ -1,6 +1,7 @@
 import { useRef, type ChangeEvent } from 'react';
 import type { AppState, QuizMode } from '../types';
 import { parseProgress } from '../utils/progressIO';
+import { formatDuration } from '../utils/format';
 import CategoryBreakdown from './CategoryBreakdown';
 import ProgressChart from './ProgressChart';
 
@@ -45,7 +46,7 @@ export default function Dashboard({
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-6">
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard label="Odpowiedzi" value={stats.totalAnswered.toString()} />
         <StatCard label="Skuteczność" value={`${accuracy}%`} />
         <StatCard label="Sesje" value={stats.sessions.toString()} />
@@ -53,6 +54,7 @@ export default function Dashboard({
           label="Egzaminy"
           value={`${stats.examsPassed}/${stats.examsAttempted}`}
         />
+        <StatCard label="Czas nauki" value={formatDuration(stats.totalTimeSec ?? 0)} />
       </section>
 
       <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
