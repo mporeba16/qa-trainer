@@ -5,12 +5,12 @@
       <stop offset="1" stop-color="#9181ff"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" ry="112" fill="url(#g)"/>
+  <rect width="512" height="512" fill="url(#g)"/>
   <text x="256" y="278"
         text-anchor="middle"
         font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, 'Helvetica Neue', Arial, sans-serif"
         font-weight="800"
-        font-size="240"
-        letter-spacing="-10"
+        font-size="190"
+        letter-spacing="-8"
         fill="#ffffff">QA</text>
 </svg>

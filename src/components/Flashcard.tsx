@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Question } from '../types';
+import { renderInline } from '../utils/markdown';
 
 type Props = {
   question: Question;
@@ -76,7 +77,7 @@ export default function Flashcard({
           {categoryLabel}
         </div>
         <h2 className="mt-2 text-lg font-semibold leading-snug text-text sm:text-xl">
-          {question.q}
+          {renderInline(question.q)}
         </h2>
 
         {question.code && (
@@ -92,15 +93,25 @@ export default function Flashcard({
                 Odpowiedź
               </div>
               <p className="mt-1 text-base font-semibold text-success">
-                {question.a[question.correct]}
+                {Array.isArray(question.correct)
+                  ? question.correct
+                      .slice()
+                      .sort((a, b) => a - b)
+                      .map((i) => renderInline(question.a[i]))
+                      .reduce<React.ReactNode[]>((acc, node, i) => {
+                        if (i > 0) acc.push(' / ');
+                        acc.push(node);
+                        return acc;
+                      }, [])
+                  : renderInline(question.a[question.correct])}
               </p>
             </div>
             <div>
               <div className="text-xs font-medium uppercase tracking-wide text-text-muted">
                 Wyjaśnienie
               </div>
-              <p className="mt-1 text-sm leading-relaxed text-text">
-                {question.expl}
+              <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-text">
+                {renderInline(question.expl)}
               </p>
             </div>
           </div>

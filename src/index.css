@@ -1,11 +1,6 @@
 @import "tailwindcss";
 
-/* Tailwind v4: aktywuj wariant dark: gdy <html data-theme="dark"> */
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
-/* Mapowanie zmiennych CSS na tokeny Tailwinda (klasy bg-bg, text-text itd.).
-   "@theme inline" mówi Tailwindowi: nie podstawiaj wartości w build time,
-   trzymaj jako var(...) — dzięki temu zmiana data-theme przełącza wszystko. */
+/* Mapowanie zmiennych CSS na tokeny Tailwinda (klasy bg-bg, text-text itd.). */
 @theme inline {
   --color-bg: var(--c-bg);
   --color-surface: var(--c-surface);
@@ -15,41 +10,31 @@
   --color-border: var(--c-border);
   --color-accent: var(--c-accent);
   --color-accent-hover: var(--c-accent-hover);
+  --color-accent-soft: var(--c-accent-soft);
   --color-success: var(--c-success);
   --color-danger: var(--c-danger);
   --color-warning: var(--c-warning);
 
-  --font-mono: ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace;
 }
 
-/* Paleta jasna (default) */
+/* Modern dark palette (Linear/Vercel-inspired). Aplikacja jest dark-only. */
 :root {
-  --c-bg: #ffffff;
-  --c-surface: #f6f8fa;
-  --c-surface-2: #eaeef2;
-  --c-text: #1f2328;
-  --c-text-muted: #656d76;
-  --c-border: #d0d7de;
-  --c-accent: #2da44e;
-  --c-accent-hover: #2c974b;
-  --c-success: #1a7f37;
-  --c-danger: #cf222e;
-  --c-warning: #bf8700;
-}
+  --c-bg: #0a0a0d;
+  --c-surface: #15151c;
+  --c-surface-2: #1e1e28;
+  --c-text: #ececf1;
+  --c-text-muted: #8a8c98;
+  --c-border: #26262f;
+  --c-accent: #7c6bff;
+  --c-accent-hover: #9181ff;
+  --c-accent-soft: #2a2454;
+  --c-success: #30a46c;
+  --c-danger: #e5484d;
+  --c-warning: #f5a623;
 
-/* Paleta ciemna (GitHub-inspired) */
-[data-theme="dark"] {
-  --c-bg: #0d1117;
-  --c-surface: #161b22;
-  --c-surface-2: #21262d;
-  --c-text: #c9d1d9;
-  --c-text-muted: #8b949e;
-  --c-border: #30363d;
-  --c-accent: #3fb950;
-  --c-accent-hover: #46c759;
-  --c-success: #3fb950;
-  --c-danger: #f85149;
-  --c-warning: #d29922;
+  color-scheme: dark;
 }
 
 html,
@@ -60,15 +45,43 @@ body,
 
 body {
   margin: 0;
-  background: var(--c-bg);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(124, 107, 255, 0.08), transparent 60%),
+    radial-gradient(800px 400px at 110% 10%, rgba(124, 107, 255, 0.05), transparent 60%),
+    var(--c-bg);
   color: var(--c-text);
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Globalne focus ring — modernowe, accent-based */
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Subtelny scrollbar w stylu nowoczesnym */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--c-surface-2);
+  border-radius: 6px;
+  border: 2px solid var(--c-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--c-border);
 }

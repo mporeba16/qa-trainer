@@ -34,24 +34,24 @@ export default function CategoryBreakdown({
   });
 
   return (
-    <div className="space-y-2">
+    <div className="grid gap-2 sm:grid-cols-2">
       {catKeys.map((cat) => {
         const row = byCat[cat];
         const pct = row.total === 0 ? 0 : Math.round((row.knownNow / row.total) * 100);
         return (
           <div
             key={cat}
-            className="rounded-md border border-border bg-surface px-3 py-2.5"
+            className="rounded-xl border border-border/80 bg-surface px-4 py-3 transition-colors hover:border-border"
           >
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-text">{categories[cat]}</span>
-              <span className="font-mono text-xs text-text-muted">
-                {row.knownNow}/{row.total} ({pct}%)
+            <div className="flex items-center justify-between gap-2 text-sm">
+              <span className="truncate text-text">{categories[cat]}</span>
+              <span className="shrink-0 font-mono text-xs tabular-nums text-text-muted">
+                {row.knownNow}/{row.total} · {pct}%
               </span>
             </div>
-            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
+            <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-surface-2">
               <div
-                className="h-full bg-accent transition-all"
+                className="h-full rounded-full bg-gradient-to-r from-accent to-accent-hover transition-all duration-300"
                 style={{ width: `${pct}%` }}
               />
             </div>

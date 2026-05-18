@@ -1,4 +1,4 @@
-import type { AppState, QuestionStat, SessionRecord } from '../types';
+import type { AppState, QuestionStat } from '../types';
 import { supabase } from '../lib/supabase';
 
 // =============================================================================
@@ -61,20 +61,8 @@ export async function uploadCloudState(
 export function mergeAppStates(cloud: AppState | null, local: AppState): AppState {
   if (!cloud) return local;
   return {
-    stats: {
-      totalAnswered: Math.max(cloud.stats.totalAnswered ?? 0, local.stats.totalAnswered ?? 0),
-      totalCorrect: Math.max(cloud.stats.totalCorrect ?? 0, local.stats.totalCorrect ?? 0),
-      sessions: Math.max(cloud.stats.sessions ?? 0, local.stats.sessions ?? 0),
-      examsAttempted: Math.max(cloud.stats.examsAttempted ?? 0, local.stats.examsAttempted ?? 0),
-      examsPassed: Math.max(cloud.stats.examsPassed ?? 0, local.stats.examsPassed ?? 0),
-      totalTimeSec: Math.max(cloud.stats.totalTimeSec ?? 0, local.stats.totalTimeSec ?? 0),
-    },
     questionStats: mergeQuestionStats(cloud.questionStats, local.questionStats),
     wrongIds: Array.from(new Set([...cloud.wrongIds, ...local.wrongIds])),
-    sessionHistory: dedupSessionHistory([
-      ...(cloud.sessionHistory ?? []),
-      ...(local.sessionHistory ?? []),
-    ]),
   };
 }
 
@@ -102,16 +90,3 @@ function mergeQuestionStats(
   return result;
 }
 
-function dedupSessionHistory(records: SessionRecord[]): SessionRecord[] {
-  const seen = new Set<string>();
-  const sorted = [...records].sort((a, b) => a.timestamp - b.timestamp);
-  const result: SessionRecord[] = [];
-  for (const rec of sorted) {
-    const key = `${rec.timestamp}|${rec.mode}|${rec.total}|${rec.correct}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      result.push(rec);
-    }
-  }
-  return result;
-}

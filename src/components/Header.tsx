@@ -1,13 +1,13 @@
 import type { User } from '@supabase/supabase-js';
-import type { Cert, Theme } from '../types';
+import type { Cert } from '../types';
 
 type Props = {
   cert: Cert;
   certs: Cert[];
   onSwitchCert: (certId: string) => void;
-  theme: Theme;
-  onToggleTheme: () => void;
   onReset: () => void;
+  onHome: () => void;
+  sessionActive: boolean;
   // auth (opcjonalne — gdy Supabase nie skonfigurowany, hide login UI)
   authEnabled: boolean;
   user: User | null;
@@ -20,9 +20,9 @@ export default function Header({
   cert,
   certs,
   onSwitchCert,
-  theme,
-  onToggleTheme,
   onReset,
+  onHome,
+  sessionActive,
   authEnabled,
   user,
   syncing,
@@ -30,18 +30,27 @@ export default function Header({
   onLogout,
 }: Props) {
   return (
-    <header className="border-b border-border bg-surface">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-2 px-4 py-3">
         <div className="flex items-center gap-3">
-          <h1 className="font-mono text-base font-semibold text-accent sm:text-lg">
-            qa_trainer.exe
-          </h1>
+          <button
+            onClick={onHome}
+            aria-label="Wróć do dashboardu"
+            className="group flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          >
+            <span className="flex h-7 items-center justify-center rounded-lg bg-gradient-to-br from-accent to-accent-hover px-2 text-sm font-bold tracking-tight text-white shadow-lg shadow-accent/30">
+              QA
+            </span>
+            <span className="font-mono text-sm font-semibold tracking-tight text-text sm:text-base">
+              trainer
+            </span>
+          </button>
           {certs.length > 1 && (
             <select
               value={cert.id}
               onChange={(e) => onSwitchCert(e.target.value)}
               aria-label="Wybierz certyfikację"
-              className="rounded-md border border-border bg-bg px-2 py-1 text-xs text-text hover:bg-surface-2 focus:outline-none focus:ring-2 focus:ring-accent"
+              className="rounded-lg border border-border bg-surface px-2.5 py-1 text-xs text-text hover:border-border/80 hover:bg-surface-2 focus:outline-none"
             >
               {certs.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -54,17 +63,19 @@ export default function Header({
         <div className="flex flex-wrap items-center gap-2">
           {authEnabled && user && (
             <span
-              className="hidden max-w-[160px] truncate font-mono text-xs text-text-muted sm:inline"
+              className="hidden max-w-[160px] items-center gap-1.5 truncate font-mono text-xs text-text-muted sm:inline-flex"
               title={user.email ?? ''}
             >
-              {user.email}
-              {syncing && <span className="ml-2 text-accent">●</span>}
+              <span className="truncate">{user.email}</span>
+              {syncing && (
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+              )}
             </span>
           )}
           {authEnabled && !user && (
             <button
               onClick={onLoginClick}
-              className="rounded-md border border-accent bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent hover:bg-accent hover:text-white"
+              className="rounded-lg border border-accent/40 bg-accent/10 px-3 py-1.5 text-sm font-medium text-accent transition-colors hover:border-accent hover:bg-accent hover:text-white"
             >
               Zaloguj
             </button>
@@ -72,22 +83,17 @@ export default function Header({
           {authEnabled && user && (
             <button
               onClick={onLogout}
-              className="rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-text hover:bg-surface-2"
+              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-surface-2 hover:text-text"
             >
               Wyloguj
             </button>
           )}
           <button
-            onClick={onToggleTheme}
-            aria-label="Przełącz motyw"
-            className="rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-text hover:bg-surface-2"
-          >
-            {theme === 'dark' ? 'Jasny' : 'Ciemny'}
-          </button>
-          <button
             onClick={onReset}
+            disabled={sessionActive}
             aria-label="Resetuj postęp"
-            className="rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-text hover:border-danger hover:text-danger"
+            title={sessionActive ? 'Zakończ lub wyjdź z quizu, by zresetować postęp' : undefined}
+            className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-danger/60 hover:text-danger disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-border disabled:hover:text-text-muted"
           >
             Reset
           </button>

@@ -3,18 +3,16 @@ import type {
   AppState,
   Cert,
   QuizMode,
-  SessionRecord,
   SessionState,
   SetupConfig,
   View,
 } from './types';
-import { DEFAULT_APP_STATE } from './types';
+import { DEFAULT_APP_STATE, isCorrectAnswer } from './types';
 import { stateKeyForCert } from './data';
+import { EXAM_SAMPLE_A, OFFICIAL_EXAM_CONFIG } from './data/exam-sample-a';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { useTheme } from './hooks/useTheme';
 import { useAuth } from './hooks/useAuth';
-import { shuffle } from './utils/shuffle';
-import { exportProgress } from './utils/progressIO';
+import { shuffle, shuffleAnswers } from './utils/shuffle';
 import {
   fetchCloudState,
   uploadCloudState,
@@ -49,7 +47,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     stateKeyForCert(cert.id),
     DEFAULT_APP_STATE,
   );
-  const { theme, toggleTheme } = useTheme();
   const {
     user,
     enabled: authEnabled,
@@ -62,7 +59,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   const [session, setSession] = useState<SessionState | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [exitOpen, setExitOpen] = useState(false);
-  const [pendingImport, setPendingImport] = useState<AppState | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimerRef = useRef<number | null>(null);
 
@@ -109,7 +105,9 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       setSynced(true);
       setSyncing(false);
       if (cloud) {
-        showToast(`Pobrano postęp z chmury (${merged.stats.totalAnswered} odp.)`);
+        const wrongCount = merged.wrongIds.length;
+        const seenCount = Object.keys(merged.questionStats).length;
+        showToast(`Pobrano postęp z chmury (${seenCount} pyt., ${wrongCount} powtórek)`);
       }
     })();
 
@@ -154,6 +152,21 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       beginQuiz('exam', { categories: [], count: cert.examCount });
       return;
     }
+    if (mode === 'official-exam') {
+      // Oficjalny egzamin: stała pula, stała kolejność, brak setupu
+      setSession({
+        mode: 'official-exam',
+        questions: EXAM_SAMPLE_A,
+        currentIdx: 0,
+        answers: new Array(EXAM_SAMPLE_A.length).fill(null),
+        answered: false,
+        correctCount: 0,
+        wrongCount: 0,
+        startTime: Date.now(),
+      });
+      setView('quiz');
+      return;
+    }
     if (mode === 'review' && appState.wrongIds.length === 0) return;
     setPendingMode(mode);
     setView('setup');
@@ -171,7 +184,8 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
           ? cert.questions
           : cert.questions.filter((q) => config.categories.includes(q.cat));
     }
-    const shuffled = shuffle(pool).slice(0, config.count);
+    // Tasujemy kolejność pytań + tasujemy opcje w każdym pytaniu (eliminuje bias B/C).
+    const shuffled = shuffle(pool).slice(0, config.count).map(shuffleAnswers);
     setSession({
       mode,
       questions: shuffled,
@@ -188,11 +202,20 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   // --- Quiz actions ---
   const selectAnswer = (idx: number) => {
     if (!session || session.answered) return;
+    const q = session.questions[session.currentIdx];
+    const isMulti = Array.isArray(q.correct);
+    const expectedCount = isMulti ? (q.correct as number[]).length : 1;
     setSession({
       ...session,
-      answers: session.answers.map((a, i) =>
-        i === session.currentIdx ? idx : a,
-      ),
+      answers: session.answers.map((a, i) => {
+        if (i !== session.currentIdx) return a;
+        if (!isMulti) return idx;
+        // multi-select: toggle; cap na expectedCount (FIFO przy przekroczeniu)
+        const cur = Array.isArray(a) ? a : [];
+        if (cur.includes(idx)) return cur.filter((x) => x !== idx);
+        const next = [...cur, idx];
+        return next.length > expectedCount ? next.slice(-expectedCount) : next;
+      }),
     });
   };
 
@@ -218,11 +241,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
           : [...prev.wrongIds, questionId];
       return {
         ...prev,
-        stats: {
-          ...prev.stats,
-          totalAnswered: prev.stats.totalAnswered + 1,
-          totalCorrect: prev.stats.totalCorrect + (isCorrect ? 1 : 0),
-        },
         questionStats: { ...prev.questionStats, [questionId]: newStat },
         wrongIds: newWrongIds,
       };
@@ -230,11 +248,16 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   };
 
   const submitAnswer = () => {
-    if (!session || session.mode === 'exam' || session.answered) return;
+    if (!session || session.answered) return;
+    if (session.mode === 'exam' || session.mode === 'official-exam') return;
     const cur = session.answers[session.currentIdx];
     if (cur === null) return;
     const q = session.questions[session.currentIdx];
-    const isCorrect = cur === q.correct;
+    // Dla multi-select: nie zatwierdzaj zanim user wybierze wszystkie oczekiwane.
+    if (Array.isArray(q.correct)) {
+      if (!Array.isArray(cur) || cur.length !== q.correct.length) return;
+    }
+    const isCorrect = isCorrectAnswer(cur, q.correct);
     recordAnswer(q.id, isCorrect);
     setSession({
       ...session,
@@ -249,44 +272,23 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       if (!s || s.endTime) return s;
       let correctCount = s.correctCount;
       let wrongCount = s.wrongCount;
-      if (s.mode === 'exam') {
+      const isAnyExam = s.mode === 'exam' || s.mode === 'official-exam';
+      if (isAnyExam) {
         correctCount = 0;
         wrongCount = 0;
         s.questions.forEach((q, i) => {
           const ans = s.answers[i];
-          const isCorrect = ans === q.correct;
+          const isCorrect = isCorrectAnswer(ans, q.correct);
           if (isCorrect) correctCount += 1;
           else wrongCount += 1;
-          recordAnswer(q.id, isCorrect);
+          // Personal stats (questionStats/wrongIds) tylko dla zwykłego egzaminu z puli cert.
+          // Oficjalny egzamin ma izolowane statystyki — nie miesza z review.
+          if (s.mode === 'exam') {
+            recordAnswer(q.id, isCorrect);
+          }
         });
       }
       const endTime = Date.now();
-      const durationSec = Math.max(0, Math.floor((endTime - s.startTime) / 1000));
-      setAppState((prev) => {
-        const pct =
-          s.questions.length === 0
-            ? 0
-            : (correctCount / s.questions.length) * 100;
-        const isExamPass = s.mode === 'exam' && pct >= cert.examPassPct;
-        const newRecord: SessionRecord = {
-          timestamp: endTime,
-          mode: s.mode,
-          total: s.questions.length,
-          correct: correctCount,
-        };
-        return {
-          ...prev,
-          stats: {
-            ...prev.stats,
-            sessions: prev.stats.sessions + 1,
-            examsAttempted:
-              prev.stats.examsAttempted + (s.mode === 'exam' ? 1 : 0),
-            examsPassed: prev.stats.examsPassed + (isExamPass ? 1 : 0),
-            totalTimeSec: (prev.stats.totalTimeSec ?? 0) + durationSec,
-          },
-          sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
-        };
-      });
       return { ...s, correctCount, wrongCount, endTime };
     });
     setView('results');
@@ -319,28 +321,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     showToast('Postęp zresetowany');
   };
 
-  // --- Backup: eksport / import ---
-  const handleExport = () => {
-    exportProgress(appState);
-    showToast('Backup pobrany');
-  };
-
-  const handleImportRequest = (state: AppState) => {
-    setPendingImport(state);
-  };
-
-  const confirmImport = () => {
-    if (!pendingImport) return;
-    const count = pendingImport.stats.totalAnswered;
-    setAppState(pendingImport);
-    setPendingImport(null);
-    showToast(`Zaimportowano backup (${count} odp.)`);
-  };
-
-  const handleImportError = () => {
-    showToast('Niepoprawny plik backupu', 'danger');
-  };
-
   // --- Fiszki: ocena karty (wiem / nie wiem) ---
   const rateFlashcard = (knew: boolean) => {
     if (!session || session.mode !== 'flashcards') return;
@@ -352,25 +332,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
 
     if (isLast) {
       // fiszki nie mają osobnego ekranu wyników — toast + powrót
-      const endTime = Date.now();
-      const durationSec = Math.max(0, Math.floor((endTime - session.startTime) / 1000));
-      setAppState((prev) => {
-        const newRecord: SessionRecord = {
-          timestamp: endTime,
-          mode: 'flashcards',
-          total: session.questions.length,
-          correct: newCorrect,
-        };
-        return {
-          ...prev,
-          stats: {
-            ...prev.stats,
-            sessions: prev.stats.sessions + 1,
-            totalTimeSec: (prev.stats.totalTimeSec ?? 0) + durationSec,
-          },
-          sessionHistory: [...(prev.sessionHistory ?? []), newRecord],
-        };
-      });
       showToast(`Fiszki: ${newCorrect} wiem, ${newWrong} nie wiem`);
       setSession(null);
       setView('home');
@@ -396,19 +357,32 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         '2': 1,
         '3': 2,
         '4': 3,
+        '5': 4,
         a: 0,
         b: 1,
         c: 2,
         d: 3,
+        e: 4,
       };
       if (k in mapping) {
+        const q = session.questions[session.currentIdx];
+        if (mapping[k] >= q.a.length) return; // pytanie 4-opcyjne, klawisz E/5 nieaktywny
         e.preventDefault();
         if (!session.answered) selectAnswer(mapping[k]);
         return;
       }
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (session.mode === 'exam') {
+        if (session.mode === 'exam' || session.mode === 'official-exam') {
+          // Blokuj Enter gdy multi-correct i niepełny wybór (np. 1 z 2)
+          const q = session.questions[session.currentIdx];
+          const ans = session.answers[session.currentIdx];
+          if (
+            Array.isArray(q.correct) &&
+            Array.isArray(ans) &&
+            ans.length > 0 &&
+            ans.length < q.correct.length
+          ) return;
           goNext();
         } else if (!session.answered) {
           if (session.answers[session.currentIdx] !== null) submitAnswer();
@@ -429,9 +403,17 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         cert={cert}
         certs={certs}
         onSwitchCert={onSwitchCert}
-        theme={theme}
-        onToggleTheme={toggleTheme}
         onReset={() => setResetOpen(true)}
+        sessionActive={session !== null}
+        onHome={() => {
+          // Aktywna sesja: poproś o potwierdzenie (utracony progres), reuse modala "Wyjść z quizu?"
+          if (session) {
+            setExitOpen(true);
+            return;
+          }
+          setPendingMode(null);
+          setView('home');
+        }}
         authEnabled={authEnabled}
         user={user}
         syncing={syncing}
@@ -446,13 +428,10 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
           appState={appState}
           cert={cert}
           onStartMode={startMode}
-          onExport={handleExport}
-          onImport={handleImportRequest}
-          onImportError={handleImportError}
         />
       )}
 
-      {view === 'setup' && pendingMode && pendingMode !== 'exam' && (
+      {view === 'setup' && pendingMode && pendingMode !== 'exam' && pendingMode !== 'official-exam' && (
         <QuizSetup
           mode={pendingMode}
           cert={cert}
@@ -495,6 +474,12 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
                 durationSec={cert.examDurationSec}
                 onTimeUp={finishQuiz}
               />
+            ) : session.mode === 'official-exam' ? (
+              <Timer
+                startTime={session.startTime}
+                durationSec={OFFICIAL_EXAM_CONFIG.durationSec}
+                onTimeUp={finishQuiz}
+              />
             ) : null
           }
         />
@@ -503,7 +488,11 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       {view === 'results' && session && (
         <QuizResults
           mode={session.mode}
-          examPassPct={cert.examPassPct}
+          examPassPct={
+            session.mode === 'official-exam'
+              ? OFFICIAL_EXAM_CONFIG.passPct
+              : cert.examPassPct
+          }
           questions={session.questions}
           answers={session.answers}
           correctCount={session.correctCount}
@@ -547,20 +536,6 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         confirmLabel="Wyjdź"
         onConfirm={exitQuiz}
         onCancel={() => setExitOpen(false)}
-      />
-
-      <ConfirmModal
-        open={pendingImport !== null}
-        title="Nadpisać postęp?"
-        message={
-          pendingImport
-            ? `Backup zastąpi obecne staty (${pendingImport.stats.totalAnswered} odp., ${pendingImport.wrongIds.length} powtórek).`
-            : ''
-        }
-        confirmLabel="Importuj"
-        danger
-        onConfirm={confirmImport}
-        onCancel={() => setPendingImport(null)}
       />
 
       <LoginModal
