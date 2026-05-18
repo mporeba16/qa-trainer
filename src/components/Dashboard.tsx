@@ -1,74 +1,39 @@
-import { useRef, type ChangeEvent } from 'react';
 import type { AppState, Cert, QuizMode } from '../types';
-import { parseProgress } from '../utils/progressIO';
-import { formatDuration } from '../utils/format';
+import { OFFICIAL_EXAM_CONFIG } from '../data/exam-sample-a';
 import CategoryBreakdown from './CategoryBreakdown';
-import ProgressChart from './ProgressChart';
 
 type Props = {
   appState: AppState;
   cert: Cert;
   onStartMode: (mode: QuizMode) => void;
-  onExport: () => void;
-  onImport: (state: AppState) => void;
-  onImportError: () => void;
 };
 
-export default function Dashboard({
-  appState,
-  cert,
-  onStartMode,
-  onExport,
-  onImport,
-  onImportError,
-}: Props) {
-  const { stats, wrongIds, questionStats } = appState;
-  const accuracy =
-    stats.totalAnswered === 0
-      ? 0
-      : Math.round((stats.totalCorrect / stats.totalAnswered) * 100);
+export default function Dashboard({ appState, cert, onStartMode }: Props) {
+  const { wrongIds, questionStats } = appState;
   const reviewDisabled = wrongIds.length === 0;
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    // reset wartości — żeby ponowny wybór tego samego pliku też trigger'ował change
-    e.target.value = '';
-    if (!file) return;
-    try {
-      const text = await file.text();
-      const parsed = parseProgress(text);
-      if (parsed) onImport(parsed);
-      else onImportError();
-    } catch {
-      onImportError();
-    }
-  };
-
   return (
-    <main className="mx-auto max-w-5xl px-4 py-6">
-      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        <StatCard label="Odpowiedzi" value={stats.totalAnswered.toString()} />
-        <StatCard label="Skuteczność" value={`${accuracy}%`} />
-        <StatCard label="Sesje" value={stats.sessions.toString()} />
-        <StatCard
-          label="Egzaminy"
-          value={`${stats.examsPassed}/${stats.examsAttempted}`}
-        />
-        <StatCard label="Czas nauki" value={formatDuration(stats.totalTimeSec ?? 0)} />
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <section className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-text sm:text-3xl">
+          {cert.name}
+        </h1>
+        <p className="mt-1.5 text-sm text-text-muted">
+          Wybierz tryb nauki lub uruchom oficjalny egzamin ISTQB.
+        </p>
       </section>
 
-      <section className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <ModeCard
           title="Praktyka"
-          description="Wybierz kategorię i liczbę pytań. Feedback od razu po odpowiedzi."
+          description="Wybierz kategorie — cały zakres odpytany. Feedback od razu po odpowiedzi."
           actionLabel="Zacznij"
+          accent="indigo"
           onClick={() => onStartMode('practice')}
         />
         <ModeCard
           title="Fiszki"
-          description="Pytanie z odsłanianą odpowiedzią. Sam oceniasz: wiem / nie wiem."
+          description="Wybierz kategorie. Sam oceniasz: wiem / nie wiem."
           actionLabel="Fiszki"
           onClick={() => onStartMode('flashcards')}
         />
@@ -84,22 +49,25 @@ export default function Dashboard({
           disabled={reviewDisabled}
         />
         <ModeCard
-          title="Egzamin"
-          description={`${cert.examCount} pytań, ${Math.round(cert.examDurationSec / 60)} min, próg ${cert.examPassPct}%. Bez podpowiedzi w trakcie.`}
+          title="Egzamin (losowy)"
+          description={`${cert.examCount} pytań losowo, ${Math.round(cert.examDurationSec / 60)} min, próg ${cert.examPassPct}%. Bez podpowiedzi.`}
           actionLabel="Egzamin"
           onClick={() => onStartMode('exam')}
         />
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
-          Trend skuteczności
-        </h2>
-        <ProgressChart history={appState.sessionHistory ?? []} />
+      <section className="mt-4">
+        <FeaturedCard
+          badge="OFICJALNE"
+          title="Egzamin ISTQB CTFL 4.0 — Zbiór A"
+          description={`Oryginalny przykładowy egzamin ISTQB (PL). ${OFFICIAL_EXAM_CONFIG.totalQuestions} pytań w oficjalnej kolejności, ${Math.round(OFFICIAL_EXAM_CONFIG.durationSec / 60)} min, próg ${OFFICIAL_EXAM_CONFIG.passPct}%. Niektóre pytania mają 5 opcji lub wymagają wyboru 2 odpowiedzi.`}
+          actionLabel="Rozpocznij egzamin oficjalny"
+          onClick={() => onStartMode('official-exam')}
+        />
       </section>
 
-      <section className="mt-8">
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
+      <section className="mt-10">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
           Postęp wg kategorii ({cert.shortName})
         </h2>
         <CategoryBreakdown
@@ -108,50 +76,7 @@ export default function Dashboard({
           questions={cert.questions}
         />
       </section>
-
-      <section className="mt-8 border-t border-border pt-6">
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-text-muted">
-          Backup
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={onExport}
-            className="rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2"
-          >
-            Eksportuj JSON
-          </button>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2"
-          >
-            Importuj JSON
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/json,.json"
-            onChange={handleFile}
-            hidden
-          />
-        </div>
-        <p className="mt-2 text-xs text-text-muted">
-          Eksport zapisze backup statystyk i powtórek do pliku. Import nadpisze obecny postęp (poprosi o potwierdzenie).
-        </p>
-      </section>
     </main>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-surface p-4">
-      <div className="text-xs font-medium uppercase tracking-wide text-text-muted">
-        {label}
-      </div>
-      <div className="mt-1 font-mono text-2xl font-semibold text-text tabular-nums">
-        {value}
-      </div>
-    </div>
   );
 }
 
@@ -161,24 +86,63 @@ function ModeCard({
   actionLabel,
   onClick,
   disabled,
+  accent,
 }: {
   title: string;
   description: string;
   actionLabel: string;
   onClick: () => void;
   disabled?: boolean;
+  accent?: 'indigo';
 }) {
+  const btnClass = accent === 'indigo'
+    ? 'mt-4 rounded-lg bg-gradient-to-br from-accent to-accent-hover px-4 py-2 text-sm font-medium text-white shadow-md shadow-accent/20 transition-all hover:shadow-lg hover:shadow-accent/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none'
+    : 'mt-4 rounded-lg border border-border bg-surface-2 px-4 py-2 text-sm font-medium text-text transition-colors hover:border-accent/40 hover:bg-accent/10 hover:text-accent disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-surface-2 disabled:hover:text-text';
+
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-surface p-4">
-      <h3 className="text-lg font-semibold text-text">{title}</h3>
-      <p className="mt-1 flex-1 text-sm text-text-muted">{description}</p>
+    <div className="group flex flex-col rounded-xl border border-border/80 bg-surface p-5 transition-colors hover:border-border">
+      <h3 className="text-base font-semibold tracking-tight text-text">{title}</h3>
+      <p className="mt-1.5 flex-1 text-sm leading-relaxed text-text-muted">{description}</p>
       <button
         onClick={onClick}
         disabled={disabled}
-        className="mt-4 rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50"
+        className={btnClass}
       >
         {actionLabel}
       </button>
+    </div>
+  );
+}
+
+function FeaturedCard({
+  badge,
+  title,
+  description,
+  actionLabel,
+  onClick,
+}: {
+  badge: string;
+  title: string;
+  description: string;
+  actionLabel: string;
+  onClick: () => void;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 via-surface to-surface p-6">
+      <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
+      <div className="relative">
+        <span className="inline-block rounded-full border border-accent/40 bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
+          {badge}
+        </span>
+        <h3 className="mt-3 text-lg font-semibold tracking-tight text-text sm:text-xl">{title}</h3>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-muted">{description}</p>
+        <button
+          onClick={onClick}
+          className="mt-5 rounded-lg bg-gradient-to-br from-accent to-accent-hover px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-accent/30 transition-all hover:shadow-xl hover:shadow-accent/40"
+        >
+          {actionLabel} →
+        </button>
+      </div>
     </div>
   );
 }

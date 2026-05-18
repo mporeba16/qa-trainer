@@ -24,6 +24,12 @@ import type { Question, Category } from '../types';
  */
 
 export const CATEGORIES: Record<Category, string> = {
+  fundamenty: 'CTFL: Podstawy testowania',
+  'cykl-wytwarzania': 'CTFL: Cykl wytwarzania',
+  statyczne: 'CTFL: Testowanie statyczne',
+  projektowanie: 'CTFL: Analiza i projektowanie',
+  zarzadzanie: 'CTFL: Zarządzanie testowaniem',
+  narzedzia: 'CTFL: Narzędzia testowe',
   istqb: 'ISTQB Fundamenty',
   defects: 'Defekty',
   agile: 'Agile/Scrum',
@@ -1564,6 +1570,1375 @@ export const QUESTIONS: Question[] = [
     ],
     correct: 1,
     expl: 'Rozmiar APK/IPA wpływa na install rate (>150 MB na cell network = duża rezygnacja). **Cold start** (z killed) to first impression — >3s frustruje, >5s = ludzie zamykają. QA monitoruje metryki przez build pipeline (size diff per PR) i performance testing na słabszych urządzeniach.'
+  },
+
+  // ===== CTFL ROZDZ. 1 — PODSTAWY TESTOWANIA (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-1.1.1 do FL-1.5.3
+
+  {
+    id: 126, cat: 'fundamenty',
+    q: 'Które z poniższych NIE jest typowym celem testów wg ISTQB?',
+    a: [
+      'Powodowanie awarii i znajdowanie defektów',
+      'Budowanie zaufania do jakości przedmiotu testów',
+      'Udowodnienie, że oprogramowanie jest wolne od defektów',
+      'Zapewnienie wymaganego pokrycia przedmiotu testów'
+    ],
+    correct: 2,
+    expl: 'Testowanie **nie może udowodnić braku defektów** — to wprost pierwsza zasada testowania (1.3). Sylabus 1.1.1 wymienia 9 typowych celów: ocena produktów pracy, powodowanie awarii i wykrywanie defektów, zapewnienie pokrycia, obniżanie ryzyka, sprawdzanie wymagań, sprawdzanie wymagań umownych/prawnych, dostarczanie informacji dla decyzji, budowanie zaufania, sprawdzanie kompletności. Cele zależą od kontekstu projektu.'
+  },
+  {
+    id: 127, cat: 'fundamenty',
+    q: 'Jaka jest fundamentalna różnica między testowaniem a debugowaniem?',
+    a: [
+      'Testowanie i debugowanie to synonimy',
+      'Testowanie wykrywa awarie/defekty, debugowanie znajduje przyczynę i ją usuwa',
+      'Testowanie wykonują testerzy, debugowanie kierownicy projektu',
+      'Debugowanie poprzedza testowanie w cyklu wytwarzania'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.1.2: **testowanie** dynamiczne wywołuje awarie (objawy defektów), statyczne wykrywa defekty bezpośrednio w produkcie pracy. **Debugowanie** to osobna czynność: odtworzenie awarii → diagnoza (znalezienie defektu) → usunięcie. Po debugowaniu wykonuje się testowanie potwierdzające (czy naprawione) i ewentualnie regresji.'
+  },
+  {
+    id: 128, cat: 'fundamenty',
+    q: 'Test sprawdza, czy system spełnia spisane wymagania funkcjonalne. To przykład:',
+    a: [
+      'Walidacji',
+      'Weryfikacji',
+      'Testowania potwierdzającego',
+      'Debugowania'
+    ],
+    correct: 1,
+    expl: '**Weryfikacja** = sprawdzenie zgodności ze specyfikowanymi wymaganiami ("did we build the product right?"). **Walidacja** = sprawdzenie, czy system odpowiada na potrzeby użytkowników w środowisku produkcyjnym ("did we build the right product?"). Sylabus 1.1 mówi, że testowanie obejmuje OBA — nie tylko weryfikację.'
+  },
+  {
+    id: 129, cat: 'fundamenty',
+    q: 'Co poprawnie opisuje łańcuch przyczynowy: pomyłka → defekt → awaria?',
+    a: [
+      'Awaria człowieka powoduje defekt, który prowadzi do pomyłki w kodzie',
+      'Człowiek popełnia pomyłkę → powstaje defekt w produkcie pracy → wykonanie wadliwego kodu może spowodować awarię',
+      'Defekt to to samo co awaria; pomyłka to ogólne pojęcie',
+      'Każdy defekt zawsze powoduje awarię'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.2.3: **pomyłka** (błąd ludzki, np. ze zmęczenia, presji) → **defekt** (usterka, pluskwa w kodzie/dokumencie) → **awaria** (system robi nie to, co powinien, lub nie robi tego, co powinien). **Podstawowa przyczyna** = źródło pomyłki, którą można wyeliminować (np. brak szkolenia). Uwaga: nie każdy defekt powoduje awarię — niektóre tylko w konkretnych warunkach.'
+  },
+  {
+    id: 130, cat: 'fundamenty',
+    q: 'Awarie mogą być powodowane wyłącznie przez defekty w kodzie. Prawda czy fałsz?',
+    a: [
+      'Prawda — awaria zawsze wynika z defektu w oprogramowaniu',
+      'Fałsz — awarie mogą być powodowane także przez warunki środowiskowe (np. promieniowanie, pole elektromagnetyczne)',
+      'Prawda, jeśli mówimy o systemach krytycznych',
+      'Fałsz — awarie wynikają wyłącznie z pomyłek operatorów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.2.3 explicite: pomyłki i defekty nie są jedynymi przyczynami awarii. Awarie mogą być spowodowane także **warunkami środowiskowymi** (promieniowanie kosmiczne, pole elektromagnetyczne, zanieczyszczenia powodujące błąd firmware\'u itp.). Dlatego analiza podstawowej przyczyny obejmuje też kontekst, nie tylko kod.'
+  },
+  {
+    id: 131, cat: 'fundamenty',
+    q: 'Testowanie a zapewnienie jakości (QA) — która para określeń jest poprawna?',
+    a: [
+      'Testowanie = QA; oba terminy są wymienne',
+      'Testowanie to forma kontroli jakości (produkt, korekcyjne); QA to zapewnienie jakości procesu (prewencyjne)',
+      'QA to to samo co testowanie potwierdzające',
+      'Testowanie jest częścią QA — testerzy odpowiadają za jakość procesów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.2.2: **Testowanie** = kontrola jakości (QC), korekcyjne, ukierunkowane na produkt. **QA** = zapewnienie jakości, prewencyjne, ukierunkowane na proces (dobry proces → dobry produkt). Oba podejścia używają wyników testów: QC do usuwania defektów, QA do oceny przebiegu procesów. Często mylone, ale to dwa różne obszary.'
+  },
+  {
+    id: 132, cat: 'fundamenty',
+    q: 'Która z poniższych NIE jest jedną z 7 zasad testowania ISTQB?',
+    a: [
+      'Testowanie ujawnia defekty, ale nie może dowieść ich braku',
+      'Wczesne testowanie oszczędza czas i pieniądze',
+      'Automatyzacja zawsze zwiększa skuteczność testowania',
+      'Testowanie zależy od kontekstu'
+    ],
+    correct: 2,
+    expl: '7 zasad (1.3): 1) Testowanie ujawnia defekty, nie dowodzi ich braku. 2) Testowanie gruntowne jest niemożliwe. 3) Wczesne testowanie oszczędza czas i pieniądze. 4) Defekty mogą się kumulować (Pareto). 5) Testy ulegają zużyciu (paradoks pestycydów). 6) Testowanie zależy od kontekstu. 7) Przekonanie o braku defektów jest błędem. Automatyzacja nie jest zasadą — to środek, nie cel.'
+  },
+  {
+    id: 133, cat: 'fundamenty',
+    q: 'Co oznacza zasada "testy ulegają zużyciu" (paradoks pestycydów)?',
+    a: [
+      'Stare przypadki testowe trzeba archiwizować po roku',
+      'Wielokrotne powtarzanie tych samych testów prowadzi do spadku ich skuteczności w wykrywaniu nowych defektów',
+      'Każdy test po wykonaniu nie nadaje się do ponownego użycia',
+      'Testy automatyczne psują się szybciej niż manualne'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.3 zasada 5: te same testy z czasem znajdują coraz mniej defektów. Przeciwdziałanie: modyfikować istniejące testy i dane testowe, pisać nowe. Wyjątek: testowanie regresji — tam świadomie powtarzamy, ale typowo automatycznie i celowo bez oczekiwania znajdowania nowych defektów (chodzi o brak nawrotów).'
+  },
+  {
+    id: 134, cat: 'fundamenty',
+    q: 'Zasada "defekty mogą się kumulować" oznacza, że:',
+    a: [
+      'Im więcej testów, tym więcej defektów',
+      'Większość defektów wykrytych przed wydaniem / awarii w eksploatacji pochodzi z niewielkiej liczby modułów (zasada Pareto)',
+      'Defekty zawsze rosną wykładniczo wraz z rozmiarem kodu',
+      'Defekty multiplikują się przy każdej zmianie kodu'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.3 zasada 4 + Pareto: zwykle większość defektów koncentruje się w niewielkiej liczbie modułów (skupiska defektów). Praktyczne zastosowanie: w testowaniu opartym na ryzyku (5.2) celujemy w skupiska, w analizie pokrycia szukamy podobnych obszarów, w retrospektywach analizujemy przyczyny.'
+  },
+  {
+    id: 135, cat: 'fundamenty',
+    q: 'Które stwierdzenie najlepiej opisuje zasadę "testowanie zależy od kontekstu"?',
+    a: [
+      'Należy zawsze stosować techniki czarnoskrzynkowe — działają w każdym kontekście',
+      'Nie ma jednego uniwersalnego podejścia; testowanie systemu medycznego wygląda inaczej niż gry mobilnej',
+      'Kontekst projektu nie wpływa na wybór technik testowania',
+      'Każdy projekt wymaga tego samego zestawu testów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.3 zasada 6 i 1.4.2: na proces testowy wpływają interesariusze, dziedzina biznesowa, krytyczność, technologia, ograniczenia (zakres/budżet/czas), regulacje, cykl wytwarzania, narzędzia. System krytyczny dla bezpieczeństwa wymaga większej rygorystyczności i niezależności niż prototyp PoC. Dobór podejścia ZAWSZE zależy od kontekstu.'
+  },
+  {
+    id: 136, cat: 'fundamenty',
+    q: 'W jakiej kolejności logicznej (choć nie zawsze chronologicznej) ustawione są główne czynności procesu testowego?',
+    a: [
+      'Planowanie → wykonywanie → analiza → monitoring → projektowanie → implementacja → ukończenie',
+      'Planowanie → monitoring i nadzór → analiza → projektowanie → implementacja → wykonywanie → ukończenie',
+      'Analiza → projektowanie → planowanie → wykonywanie → ukończenie → monitoring',
+      'Implementacja → analiza → planowanie → projektowanie → wykonywanie → monitoring → ukończenie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.4.1 wymienia 7 głównych grup czynności: **planowanie** (cele, podejście) → **monitorowanie i nadzór** (ciągle) → **analiza** ("co testować") → **projektowanie** ("jak testować", przypadki) → **implementacja** (procedury, dane, środowisko) → **wykonywanie** → **ukończenie** (raport, archiwizacja, retrospekcja). Często iteracyjnie i równolegle.'
+  },
+  {
+    id: 137, cat: 'fundamenty',
+    q: 'Plan testów, harmonogram, rejestr ryzyk oraz kryteria wejścia/wyjścia to testalia związane z:',
+    a: [
+      'Wykonywaniem testów',
+      'Planowaniem testów',
+      'Ukończeniem testów',
+      'Analizą testów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.4.3: produkty pracy planowania to plan testów, harmonogram, rejestr ryzyk, kryteria wejścia/wyjścia. Inne grupy: analiza → warunki testowe, raporty o defektach w podstawie testów; projektowanie → przypadki testowe, karty opisów testów; implementacja → procedury, skrypty, dane testowe, środowisko; wykonywanie → dzienniki testów, raporty o defektach; ukończenie → raport sumaryczny, lista usprawnień.'
+  },
+  {
+    id: 138, cat: 'fundamenty',
+    q: 'Jaka jest główna korzyść ze śledzenia powiązań (traceability) między podstawą testów a testaliami?',
+    a: [
+      'Spełnia wymóg formalny przy audycie ISO',
+      'Umożliwia ocenę pokrycia, śledzenie wpływu zmian i raportowanie statusu w zrozumiały dla interesariuszy sposób',
+      'Pozwala automatyzować wszystkie przypadki testowe',
+      'Eliminuje potrzebę testowania regresji'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.4.4: traceability łączy wymagania → warunki testowe → przypadki testowe → wyniki → defekty. Korzyści: ocena pokrycia testowego, ocena ryzyka rezydualnego (powiązanie wyników z ryzykami), analiza wpływu zmian, audyty, bardziej zrozumiałe raporty (np. KPI realizacji wymagań biznesowych zamiast "300 testów green").'
+  },
+  {
+    id: 139, cat: 'fundamenty',
+    q: 'Sylabus CTFL v4.0.1 wyróżnia dwie zasadnicze role w testowaniu. Które?',
+    a: [
+      'Test Manager i Test Architect',
+      'Manualny tester i automatyczny tester',
+      'Rola związana z zarządzaniem testami oraz rola związana z testowaniem',
+      'QA Engineer i QA Analyst'
+    ],
+    correct: 2,
+    expl: 'Sylabus 1.4.5: **zarządzanie testami** (planowanie, monitoring, nadzór, ukończenie — przykładowo: lider zespołu, kierownik testów) i **testowanie** (analiza, projektowanie, implementacja, wykonywanie). Ta sama osoba może pełnić obie role. W Scrumie zarządzanie często rozproszone na zespół, lider, czasem PO/SM.'
+  },
+  {
+    id: 140, cat: 'fundamenty',
+    q: 'Co oznacza zjawisko "confirmation bias" w kontekście pracy testera?',
+    a: [
+      'Skłonność do potwierdzania wyników testów drugim wykonaniem',
+      'Tendencja do trudnego akceptowania informacji sprzecznych z dotychczasowymi przekonaniami (np. przez autora kodu odbierającego raport o defekcie)',
+      'Wymóg zatwierdzania defektów przez kierownika testów',
+      'Konieczność powtarzania testów potwierdzających'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.5.1: **confirmation bias** (efekt potwierdzenia) — psychologiczna tendencja do odrzucania informacji sprzecznych z dotychczasowymi przekonaniami. Dlatego autor kodu może być oporny na raport o defekcie, a komunikacja z zespołem dewelopmentu musi być konstruktywna. Wymaga umiejętności komunikacyjnych, aktywnego słuchania, prezentowania defektów jako informacji, nie krytyki.'
+  },
+  {
+    id: 141, cat: 'fundamenty',
+    q: 'Podejście "cały zespół" (whole-team approach) oznacza, że:',
+    a: [
+      'Tylko testerzy odpowiadają za jakość produktu',
+      'Każdy członek zespołu, mając niezbędną wiedzę i umiejętności, może wykonywać dowolne zadania; odpowiedzialność za jakość spoczywa na wszystkich',
+      'Cały zespół testuje na koniec sprintu',
+      'Każdy członek zespołu musi mieć certyfikat ISTQB'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.5.2: pochodzi z eXtreme Programming (XP). Zwiększa dynamikę pracy zespołowej, ułatwia wymianę informacji, daje efekt synergii. Testerzy współpracują z biznesem przy testach akceptacyjnych, z programistami przy automatyzacji. Uwaga: w systemach krytycznych może być wymagana wysoka niezależność testów — wtedy whole-team nie wystarczy.'
+  },
+  {
+    id: 142, cat: 'fundamenty',
+    q: 'Które stwierdzenie o niezależności testowania jest prawdziwe?',
+    a: [
+      'Niezależność testowania całkowicie zastępuje znajomość produktu',
+      'Programiści nie potrafią wykrywać defektów we własnym kodzie',
+      'Pewien stopień niezależności zwykle zwiększa skuteczność wykrywania defektów, ale niezależność nie zastępuje znajomości produktu',
+      'Im wyższy poziom niezależności, tym lepiej — zawsze należy zatrudniać firmę zewnętrzną'
+    ],
+    correct: 2,
+    expl: 'Sylabus 1.5.3: niezależność zwiększa skuteczność (inne błędy poznawcze, inne doświadczenia), ale **nie zastępuje** znajomości produktu — programiści wykrywają wiele defektów we własnym kodzie. Najlepiej sprawdza się testowanie na wielu poziomach niezależności: dev robi unity i integrację modułów, zespół testowy systemowe, biznes akceptacyjne.'
+  },
+  {
+    id: 143, cat: 'fundamenty',
+    q: 'Co jest WADĄ wysokiej niezależności testowania (np. odizolowany zespół testowy lub firma zewnętrzna)?',
+    a: [
+      'Wykrywa się mniej defektów',
+      'Ryzyko braku wymiany informacji i konfliktów z deweloperami, utrata poczucia odpowiedzialności za jakość przez programistów, możliwość traktowania testerów jako wąskiego gardła',
+      'Wyższy koszt licencji narzędzi',
+      'Konieczność dłuższych szkoleń'
+    ],
+    correct: 1,
+    expl: 'Sylabus 1.5.3 wymienia konkretne wady: izolacja niezależnych testerów rodzi problemy komunikacyjne, konflikty, programiści mogą "zrzucić" odpowiedzialność za jakość na testerów ("oni to wyłapią"), istnieje ryzyko że testerzy zostaną obarczeni winą za nieterminowe wydania. To są realne risk-faktory — szczególnie w systemach o wysokim ryzyku.'
+  },
+
+  // ===== CTFL ROZDZ. 2 — TESTOWANIE W CYKLU WYTWARZANIA (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-2.1.1 do FL-2.3.1
+
+  {
+    id: 144, cat: 'cykl-wytwarzania',
+    q: 'Który zestaw poprawnie klasyfikuje modele cyklu wytwarzania (SDLC)?',
+    a: [
+      'Sekwencyjne: kaskadowy, V-model; iteracyjne: spiralny, prototypowanie; przyrostowe: Unified Process',
+      'Sekwencyjne: Scrum; iteracyjne: kaskadowy; przyrostowe: V-model',
+      'Wszystkie modele są iteracyjne; tylko nazwy się różnią',
+      'Sekwencyjne: Kanban; iteracyjne: kaskadowy; przyrostowe: XP'
+    ],
+    correct: 0,
+    expl: 'Sylabus 2.1: **sekwencyjne** = kaskadowy (waterfall) i V-model (kod powstaje w późniejszych fazach, dynamiczne testowanie późno). **Iteracyjne** = spiralny, prototypowanie. **Przyrostowe** = Unified Process. Metody zwinne (Scrum, XP, Kanban) bazują głównie na podejściu iteracyjno-przyrostowym. ATDD/BDD/TDD to praktyki, nie modele SDLC.'
+  },
+  {
+    id: 145, cat: 'cykl-wytwarzania',
+    q: 'Na co wpływa wybrany model cyklu wytwarzania oprogramowania w kontekście testowania?',
+    a: [
+      'Tylko na koszt projektu',
+      'Tylko na liczbę testerów w zespole',
+      'Na zakres i czas wykonywania czynności testowych, szczegółowość testaliów, wybór technik i podejść, zakres automatyzacji oraz role i obowiązki testera',
+      'Wyłącznie na używane narzędzia'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.1.1 wymienia 5 aspektów na które wpływa model SDLC: (1) zakres i czas czynności testowych, (2) szczegółowość testaliów, (3) wybór technik i podejść do testowania, (4) zakres automatyzacji testów, (5) role i obowiązki testera. W modelu sekwencyjnym tester wchodzi późno; w zwinnym — od początku i często.'
+  },
+  {
+    id: 146, cat: 'cykl-wytwarzania',
+    q: 'Które stwierdzenie opisuje dobre praktyki testowania mające zastosowanie do KAŻDEGO modelu SDLC?',
+    a: [
+      'Tylko testy automatyczne są dobrą praktyką',
+      'Każdej czynności wytwórczej odpowiada czynność testowa; każdy poziom testów ma odrębne cele; analiza i projektowanie testów rozpoczyna się w fazie wytwórczej tego poziomu; testerzy uczestniczą w przeglądach',
+      'Testowanie zawsze rozpoczyna się po zakończeniu kodowania',
+      'Każdy poziom testów ma identyczne cele'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.1.2 — 4 dobre praktyki uniwersalne: (1) każda czynność wytwórcza ma odpowiadającą czynność testową, (2) różne cele dla różnych poziomów testów (unikanie nadmiarowości), (3) analiza/projektowanie testów dla danego poziomu zaczyna się w fazie wytwarzania tego poziomu (zgodnie z zasadą wczesnego testowania), (4) testerzy uczestniczą w przeglądach od momentu udostępnienia wersji roboczych.'
+  },
+  {
+    id: 147, cat: 'cykl-wytwarzania',
+    q: 'Czym różni się TDD od ATDD?',
+    a: [
+      'TDD i ATDD to to samo',
+      'TDD pisze testy modułowe przed kodem (sterowane testami jednostkowymi); ATDD wywodzi testy z kryteriów akceptacji i pisze je przed wytworzeniem funkcjonalności',
+      'TDD jest dla testerów, ATDD dla developerów',
+      'TDD wymaga BDD, ATDD nie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.1.3: **TDD** (Test-Driven Development, Beck 2003) — najpierw piszemy test modułowy, potem minimum kodu, by przeszedł, potem refaktor. Sterowane przez programistę. **ATDD** (Acceptance Test-Driven Development) — testy wywodzą się z kryteriów akceptacji, pisane przed wytworzeniem fragmentu aplikacji (patrz 4.5.3). **BDD** — pożądane zachowanie w formie Given/When/Then, czytelne dla biznesu.'
+  },
+  {
+    id: 148, cat: 'cykl-wytwarzania',
+    q: 'W jakiej formie najczęściej zapisuje się scenariusze w BDD?',
+    a: [
+      'W formie kodu testowego (JUnit/PyTest)',
+      'W formie matematycznej notacji formalnej',
+      'W prostej formie języka naturalnego, zwykle Given/When/Then (Mając/Kiedy/Wtedy)',
+      'W formie diagramu UML'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.1.3: BDD (Behavior-Driven Development, Chelimsky 2010) opisuje pożądane zachowanie w **języku naturalnym**, formacie **Given/When/Then** (po polsku Mając/Kiedy/Wtedy). Cel: scenariusze są zrozumiałe dla interesariuszy biznesowych, ale jednocześnie automatycznie przekładalne na testy wykonywalne (np. przez Cucumber/SpecFlow).'
+  },
+  {
+    id: 149, cat: 'cykl-wytwarzania',
+    q: 'Jakie są typowe korzyści metodyki DevOps z perspektywy testowania?',
+    a: [
+      'Eliminacja potrzeby testowania manualnego',
+      'Szybkie informacje zwrotne, ciągła integracja sprzyjająca shift-left, automatyczne pipeline\'y, większa widoczność charakterystyk niefunkcjonalnych, zmniejszenie ryzyka regresji dzięki skali automatyzacji',
+      'Mniej testów regresji',
+      'Brak konieczności posiadania środowisk testowych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.1.4 — korzyści DevOps dla testowania: (1) szybkie informacje zwrotne nt. jakości i wpływu zmian, (2) ciągła integracja → shift-left, (3) automatyzacja CI/CD ułatwia stabilne środowiska, (4) widoczność niefunkcjonalnych (wydajność, niezawodność), (5) mniej powtarzalnego testowania manualnego, (6) szeroki zasięg testów regresji = niższe ryzyko. Manualne wciąż potrzebne (zwłaszcza UX).'
+  },
+  {
+    id: 150, cat: 'cykl-wytwarzania',
+    q: 'Wdrożenie DevOps wiąże się z określonymi ryzykami i wyzwaniami. Które są wymienione w sylabusie?',
+    a: [
+      'Brak ryzyk — DevOps zawsze działa lepiej',
+      'Konieczność zdefiniowania potoku dostarczania, narzędzi CI/CD oraz przeznaczenia zasobów na automatyzację i utrzymanie mechanizmów automatyzacji',
+      'DevOps wymaga obowiązkowo testów manualnych',
+      'DevOps zwiększa koszt testowania zawsze 2-krotnie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.1.4 wymienia konkretne ryzyka: (1) konieczność zdefiniowania potoku dostarczania DevOps, (2) wdrożenie i utrzymanie narzędzi CI/CD, (3) **dodatkowe zasoby na automatyzację testów oraz utrzymanie skryptów** — to często niedoceniany koszt. Sukces DevOps wymaga zmiany kultury organizacyjnej (likwidacja silosów dev–ops).'
+  },
+  {
+    id: 151, cat: 'cykl-wytwarzania',
+    q: 'Co oznacza "przesunięcie w lewo" (shift left)?',
+    a: [
+      'Przenoszenie testerów do zespołu deweloperskiego',
+      'Wykonywanie testów regresji po wydaniu',
+      'Wykonywanie testowania na wcześniejszych etapach cyklu wytwarzania (przeglądy specyfikacji, testy przed kodowaniem, analiza statyczna, niefunkcjonalne na poziomie modułowym, CI/CD)',
+      'Zmiana metodyki z agile na waterfall'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.1.5: shift left = realizacja zasady wczesnego testowania (1.3) w praktyce. Konkretne wdrożenia: (1) przegląd specyfikacji z perspektywy testera, (2) pisanie testów przed kodem (TDD/ATDD/BDD), (3) ciągła integracja, (4) analiza statyczna kodu przed testowaniem dynamicznym, (5) niefunkcjonalne już na modułowym. Wymaga większego wysiłku wcześnie, ale obniża koszty później. **Nie zwalnia** z późniejszego testowania!'
+  },
+  {
+    id: 152, cat: 'cykl-wytwarzania',
+    q: 'Kiedy organizuje się retrospektywy i jakie są typowe korzyści dla testowania?',
+    a: [
+      'Tylko po awariach produkcyjnych; korzyść to wina dla testera',
+      'Po zakończeniu projektu/iteracji/kamienia milowego (zwykle przed przekazaniem do eksploatacji); korzyści: skuteczniejsze testy, lepsza jakość testaliów i podstawy testów, więź w zespole, lepsza współpraca dev↔QA',
+      'Co tydzień, niezależnie od kontekstu',
+      'Tylko w Scrumie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.1.6: retrospektywy zwykle po projekcie/iteracji/kamieniu milowym (przed przekazaniem do eksploatacji), ale mogą być też w innych momentach. Pytania: co poszło dobrze, co źle, co poprawić, jak zachować dobre praktyki. Korzyści dla testowania: lepsze testy, lepsze testalia, lepsza podstawa testów (analiza wymagań), wzmocnienie więzi zespołu, lepsza współpraca dev↔QA.'
+  },
+  {
+    id: 153, cat: 'cykl-wytwarzania',
+    q: 'Sylabus CTFL v4.0.1 wymienia 5 poziomów testów. Które to?',
+    a: [
+      'Modułowe, integracji modułów, systemowe, integracji systemów, akceptacyjne',
+      'Smoke, sanity, regression, exploratory, acceptance',
+      'Unit, API, UI, performance, security',
+      'Plan, design, execute, report, close'
+    ],
+    correct: 0,
+    expl: 'Sylabus 2.2.1 — 5 poziomów: (1) **modułowe** (jednostkowe/komponentowe) — programiści, frameworki, (2) **integracji modułów** — interfejsy między modułami, strategie zstępująca/wstępująca/big bang, (3) **systemowe** — całość systemu, często niezależny zespół, (4) **integracji systemów** — interfejsy z systemami zewnętrznymi, (5) **akceptacyjne** — walidacja gotowości do wdrożenia.'
+  },
+  {
+    id: 154, cat: 'cykl-wytwarzania',
+    q: 'Które formy testowania akceptacyjnego wymienia sylabus CTFL?',
+    a: [
+      'UAT i regresji',
+      'Smoke i sanity',
+      'Akceptacyjne użytkownika (UAT), operacyjne (OAT), zgodności z umową, zgodności z prawem oraz alfa i beta',
+      'Tylko alfa i beta'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.2.1 — formy akceptacyjnego: **UAT** (user acceptance — biznes, end-userzy), **OAT** (operational — backup, recovery, security ops), **contract acceptance** (zgodność z umową), **regulation acceptance** (regulacje prawne), **alfa** (u producenta, testują zewnętrzni użytkownicy), **beta** (u klientów). Często wykonywane przez docelowych użytkowników, nie testerów.'
+  },
+  {
+    id: 155, cat: 'cykl-wytwarzania',
+    q: 'Po czym rozróżnia się poziomy testów, aby uniknąć ich nakładania się?',
+    a: [
+      'Tylko po liczbie testerów',
+      'Po przedmiocie testów, celach testów, podstawie testów, defektach/awariach oraz podejściach i odpowiedzialnościach',
+      'Tylko po czasie wykonywania',
+      'Po cenie licencji narzędzi'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.2.1 wymienia 5 atrybutów rozróżniających poziomy testów: (1) przedmiot testów (moduł vs system vs interfejs systemów), (2) cele (znaleźć defekty modułu vs walidować gotowość), (3) podstawa testów (kod vs specyfikacja vs wymagania biznesowe), (4) typowe defekty i awarie, (5) podejścia i odpowiedzialności. Bez tego = nadmiarowość lub luki w pokryciu.'
+  },
+  {
+    id: 156, cat: 'cykl-wytwarzania',
+    q: 'Sprawdzanie, "co" powinien robić system (funkcje) vs "jak dobrze" się zachowuje (atrybuty) — które typy testów to opisują?',
+    a: [
+      'Czarnoskrzynkowe vs białoskrzynkowe',
+      'Funkcjonalne vs niefunkcjonalne',
+      'Akceptacyjne vs systemowe',
+      'Manualne vs automatyczne'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.2.2: **funkcjonalne** = "co" — ocena funkcji (kompletność, poprawność, adekwatność funkcjonalna). **Niefunkcjonalne** = "jak dobrze" — atrybuty inne niż funkcje. Ortogonalne do podziału czarno-/białoskrzynkowe — niefunkcjonalne można robić techniką czarnoskrzynkową (load test) lub białoskrzynkową (profiling kodu).'
+  },
+  {
+    id: 157, cat: 'cykl-wytwarzania',
+    q: 'ISO/IEC 25010 wymienia 8 charakterystyk niefunkcjonalnych. Która z poniższych NIE jest tam wymieniona?',
+    a: [
+      'Wydajność działania (performance efficiency)',
+      'Niezawodność',
+      'Czytelność kodu',
+      'Użyteczność (zdolność do interakcji)'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.2.2 cytuje ISO/IEC 25010: **wydajność działania, kompatybilność, użyteczność, niezawodność, zabezpieczenia, utrzymywalność, przenaszalność (elastyczność), bezpieczeństwo**. Czytelność kodu to atrybut wewnętrznej jakości kodu, nie jest osobną charakterystyką w 25010 (mieści się w utrzymywalności, ale jako sub-charakterystyka).'
+  },
+  {
+    id: 158, cat: 'cykl-wytwarzania',
+    q: 'Test wyprowadzony z analizy struktury wewnętrznej kodu (np. pokrycie gałęzi) to:',
+    a: [
+      'Testowanie czarnoskrzynkowe',
+      'Testowanie białoskrzynkowe',
+      'Testowanie potwierdzające',
+      'Testowanie eksploracyjne'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.2.2: **białoskrzynkowe** (strukturalne) — wyprowadzane z implementacji/struktury wewnętrznej (kod, architektura, przepływy pracy/danych). Cel: pokrycie struktury bazowej. **Czarnoskrzynkowe** — ze specyfikacji, niezależnie od implementacji. Oba można stosować na każdym poziomie testów.'
+  },
+  {
+    id: 159, cat: 'cykl-wytwarzania',
+    q: 'Czym różni się testowanie potwierdzające od testowania regresji?',
+    a: [
+      'Potwierdzające = czy poprawka naprawiła konkretny defekt; regresji = czy zmiana nie zepsuła czegoś innego (w tym samym lub innych modułach/systemach)',
+      'Potwierdzające jest manualne, regresji automatyczne — to jedyna różnica',
+      'Oba to synonimy',
+      'Potwierdzające wykonujemy raz, regresji nigdy'
+    ],
+    correct: 0,
+    expl: 'Sylabus 2.2.3: **potwierdzające** (re-test) — sprawdzenie, czy zgłoszony defekt został usunięty. Wykonuje się przypadki, które wcześniej nie przeszły, ewentualnie nowe pokrywające zmianę. **Regresji** — sprawdzenie, czy zmiana (w tym poprawka) nie wprowadziła negatywnych konsekwencji w niezmienionych obszarach. Regresja może wykraczać poza przedmiot testów i powinna obejmować analizę wpływu.'
+  },
+  {
+    id: 160, cat: 'cykl-wytwarzania',
+    q: 'Dlaczego testowanie regresji świetnie nadaje się do automatyzacji?',
+    a: [
+      'Bo wymaga kreatywności',
+      'Bo zestawy regresji są wykonywane wielokrotnie (każda iteracja, każde wydanie) i liczba przypadków rośnie z czasem — automatyzacja jest opłacalna',
+      'Bo nie wymaga oczekiwanych rezultatów',
+      'Bo defekty regresji są nieistotne'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.2.3: regresja powtarza się wielokrotnie, baza testów regresji rośnie z każdym wydaniem → wysokie ROI z automatyzacji. Automatyzację regresji warto zacząć wcześnie. W DevOps regresja w CI/CD = szybkie wykrywanie, że nowa zmiana nie złamała wcześniejszej funkcjonalności. Może obejmować różne poziomy testów.'
+  },
+  {
+    id: 161, cat: 'cykl-wytwarzania',
+    q: 'Co to jest testowanie pielęgnacyjne (maintenance testing)?',
+    a: [
+      'Czyszczenie środowisk testowych',
+      'Aktualizacja dokumentacji testowej',
+      'Testowanie wykonywane po wdrożeniu/przekazaniu do eksploatacji — przy modyfikacjach, migracjach lub wycofaniu systemu, aby zweryfikować zmiany i wychwycić regresję',
+      'Testowanie tylko poprawek dla bugów blokujących'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.3: pielęgnacyjne wynika z wdrożenia oprogramowania i obejmuje testowanie w fazie eksploatacji — zarówno planowane (releases, fixy), jak i niezaplanowane (hot fix). Obejmuje sprawdzenie czy zmiana wprowadzona pomyślnie + wykrycie regresji w niezmienionej części systemu. Standard: ISO/IEC 14764.'
+  },
+  {
+    id: 162, cat: 'cykl-wytwarzania',
+    q: 'Jakie czynniki wpływają na zakres testowania pielęgnacyjnego?',
+    a: [
+      'Tylko budżet',
+      'Tylko liczba testerów',
+      'Poziom ryzyka związanego ze zmianą, wielkość dotychczasowego systemu, wielkość wprowadzonej zmiany',
+      'Tylko czas wykonania'
+    ],
+    correct: 2,
+    expl: 'Sylabus 2.3: zakres testów pielęgnacyjnych zależy od (1) ryzyka zmiany (poprawka security w bankowości > zmiana koloru przycisku), (2) wielkości istniejącego systemu (duży system = więcej obszarów na regresję), (3) skali zmiany (refaktor architektury vs literówka w UI). Przed wprowadzeniem zmiany robi się **analizę wpływu**.'
+  },
+  {
+    id: 163, cat: 'cykl-wytwarzania',
+    q: 'Które zdarzenia wyzwalają testowanie pielęgnacyjne wg sylabusa?',
+    a: [
+      'Tylko bug fixy',
+      'Modyfikacje (planowane release, korekcyjne, hot fixy), uaktualnienia/migracje środowiska, wycofanie systemu (archiwizacja, odzyskiwanie danych)',
+      'Tylko zmiany w prawie',
+      'Tylko zmiany interfejsu użytkownika'
+    ],
+    correct: 1,
+    expl: 'Sylabus 2.3 — 3 kategorie zdarzeń: (1) **modyfikacje** (planowane usprawnienia, korekcyjne, hot fixy), (2) **uaktualnienia/migracje środowiska** (zmiana platformy, migracja danych — testy konwersji), (3) **wycofanie** (testy archiwizacji, procedur przywracania/odtwarzania danych, jeśli muszą być przechowywane długo).'
+  },
+
+  // ===== CTFL ROZDZ. 3 — TESTOWANIE STATYCZNE (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-3.1.1 do FL-3.2.5
+
+  {
+    id: 164, cat: 'statyczne',
+    q: 'Czym charakteryzuje się testowanie statyczne w przeciwieństwie do dynamicznego?',
+    a: [
+      'Wykonuje się je tylko w środowisku produkcyjnym',
+      'Nie wymaga uruchamiania testowanego oprogramowania — ocena następuje przez przeglądy manualne lub analizę statyczną narzędziem',
+      'Wymaga uruchomienia kodu i obserwacji zachowania',
+      'Można je stosować wyłącznie do kodu źródłowego'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.1: testowanie **statyczne** nie uruchamia oprogramowania — ocenia produkty pracy przez **przeglądy** (manualnie) lub **analizę statyczną** (narzędzia). Bada np. kod, specyfikacje, modele, plany testów. Realizuje zasadę wczesnego testowania (1.3). Często mniej pracochłonne niż dynamiczne, bo nie wymaga tworzenia przypadków testowych.'
+  },
+  {
+    id: 165, cat: 'statyczne',
+    q: 'Które z poniższych produktów pracy mogą być badane technikami testowania statycznego?',
+    a: [
+      'Tylko kod źródłowy',
+      'Tylko wymagania',
+      'Niemal wszystkie: wymagania, kod, plany testów, przypadki testowe, pozycje backlogu, karty opisu testów, dokumentacja projektu, umowy, modele',
+      'Tylko działające oprogramowanie'
+    ],
+    correct: 2,
+    expl: 'Sylabus 3.1.1: niemal każdy produkt pracy. **Przegląd**: dowolny czytelny dokument. **Analiza statyczna**: tylko to, co ma formalną składnię (kod, modele formalne, tekst strukturalny). NIE nadają się: kod 3rd party bez praw do analizy, prototypy bardzo trudne do zinterpretowania przez człowieka.'
+  },
+  {
+    id: 166, cat: 'statyczne',
+    q: 'Jakie są typowe korzyści z testowania statycznego?',
+    a: [
+      'Zastępuje testowanie dynamiczne',
+      'Wykrywa defekty na wczesnym etapie (zmniejszenie kosztów naprawy), znajduje defekty trudne lub niemożliwe do wykrycia dynamicznie, buduje wspólne zrozumienie w zespole, usprawnia komunikację',
+      'Zawsze jest tańsze niż dynamiczne',
+      'Eliminuje potrzebę pisania przypadków testowych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.1.2: (1) wczesne wykrycie = mniejszy koszt naprawy, (2) defekty trudne dla dynamicznego (nieosiągalny kod, błędne wzorce projektowe, defekty w niewykonywalnych produktach), (3) ocena jakości i budowanie zaufania, (4) wspólny punkt widzenia interesariuszy, (5) usprawnienie komunikacji. Łączny koszt projektu zwykle niższy mimo kosztu przeglądów.'
+  },
+  {
+    id: 167, cat: 'statyczne',
+    q: 'Które defekty są ŁATWIEJSZE lub TAŃSZE do wykrycia testowaniem statycznym niż dynamicznym?',
+    a: [
+      'Wycieki pamięci pod obciążeniem produkcyjnym',
+      'Problemy wydajności pod 1000 użytkowników',
+      'Defekty w wymaganiach (niespójność, niejednoznaczność), defekty projektowe, niezadeklarowane zmienne, odchylenia od standardów nazewnictwa, niepoprawne specyfikacje interfejsów, luki w pokryciu testami',
+      'Awarie hardware\'u'
+    ],
+    correct: 2,
+    expl: 'Sylabus 3.1.3 — przykłady defektów dla testowania statycznego: defekty w wymaganiach (niespójność, sprzeczność, niejednoznaczność, przeoczenia), nieefektywne struktury danych, nieosiągalny kod, niezadeklarowane zmienne, niezgodność z konwencjami nazewnictwa, błędne specyfikacje interfejsów (typ/liczba/kolejność parametrów), słabe punkty zabezpieczeń (np. buffer overflow), luki w pokryciu kryteriów akceptacji.'
+  },
+  {
+    id: 168, cat: 'statyczne',
+    q: 'Która różnica między testowaniem statycznym a dynamicznym jest poprawna?',
+    a: [
+      'Statyczne wymaga uruchomienia kodu, dynamiczne nie',
+      'Statyczne wykrywa defekty bezpośrednio; dynamiczne powoduje awarie, które potem są analizowane w celu znalezienia defektów',
+      'Oba wymagają oczekiwanych rezultatów',
+      'Statyczne stosuje się tylko do wykonywalnego kodu'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.1.3: testowanie **statyczne** wykrywa defekty **bezpośrednio** w produkcie. Testowanie **dynamiczne** wywołuje **awarie** (manifestację defektów), które potem są analizowane (debugging) by zlokalizować defekt. Statyczne stosuje się do dowolnych produktów (w tym niewykonywalnych); dynamiczne — tylko do wykonywalnych. Statyczne mierzy charakterystyki niezależne od wykonania (czytelność, utrzymywalność).'
+  },
+  {
+    id: 169, cat: 'statyczne',
+    q: 'Dlaczego ważne jest otrzymywanie informacji zwrotnych od interesariuszy wcześnie i często?',
+    a: [
+      'Bo to wymóg ISO',
+      'Pozwala wcześnie rozpoznać problemy z jakością, uniknąć kosztownych poprawek, zapobiec niespełnieniu oczekiwań, niedotrzymaniu terminów i potencjalnemu niepowodzeniu projektu',
+      'Pozwala zwiększyć liczbę spotkań w projekcie',
+      'Skraca tylko fazę testowania, ale wydłuża wytwarzanie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.2.1: jeśli interesariusze włączają się późno, finalny produkt może rozjechać się z ich wizją. Konsekwencje: kosztowne poprawki, niedotrzymanie terminów, przerzucanie odpowiedzialności, możliwe niepowodzenie całego projektu. Częsty feedback we wszystkich fazach pozwala zespołowi szybciej analizować zmiany i koncentrować się na priorytetach interesariuszy.'
+  },
+  {
+    id: 170, cat: 'statyczne',
+    q: 'Jakie są kolejne czynności procesu przeglądu wg standardu ISO/IEC 20246?',
+    a: [
+      'Planowanie → wykonanie → ukończenie',
+      'Planowanie → rozpoczęcie przeglądu → przegląd indywidualny → przekazanie informacji i analiza → usunięcie defektów i raportowanie',
+      'Inspekcja → przejrzenie → przegląd nieformalny',
+      'Pisanie kodu → review → merge'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.2.2 cytuje ISO/IEC 20246 — 5 czynności: (1) **Planowanie** (zakres, cel, kryteria wyjścia, ramy czasowe), (2) **Rozpoczęcie** (dostęp do materiałów, role, gotowość), (3) **Przegląd indywidualny** (każdy ocenia, notuje anomalie), (4) **Przekazanie informacji i analiza** (spotkanie, kwalifikacja anomalii, decyzje), (5) **Usunięcie defektów i raportowanie** (raport, kryteria wyjścia).'
+  },
+  {
+    id: 171, cat: 'statyczne',
+    q: 'Kto według sylabusa decyduje o tym, CO ma być przedmiotem przeglądu i udostępnia zasoby?',
+    a: [
+      'Autor',
+      'Moderator',
+      'Kierownik (manager)',
+      'Protokolant'
+    ],
+    correct: 2,
+    expl: 'Sylabus 3.2.3 wymienia 6 ról: **Kierownik** — decyduje co ma być przedmiotem, udostępnia zasoby, wyznacza ludzi, określa ramy czasowe. **Autor** — tworzy produkt, usuwa defekty. **Moderator/facylitator** — dba o spotkanie, mediuje. **Protokolant/rejestrujący** — gromadzi informacje o anomaliach. **Przeglądający** — wykonuje przegląd. **Lider przeglądu** — odpowiada za przegląd, decyduje kto bierze udział, gdzie i kiedy.'
+  },
+  {
+    id: 172, cat: 'statyczne',
+    q: 'Główną rolą moderatora (facylitatora) w przeglądzie jest:',
+    a: [
+      'Tworzenie produktu pracy i usuwanie defektów',
+      'Dbanie o sprawny przebieg spotkania, mediacja, zarządzanie czasem i zapewnienie warunków, w których każdy uczestnik może swobodnie wyrażać zdanie',
+      'Decydowanie o tym, co jest przedmiotem przeglądu',
+      'Protokołowanie anomalii'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.2.3: **moderator** dba o sprawny przebieg spotkania, jest mediatorem, zarządza czasem, zapewnia bezpieczne warunki dla wszystkich uczestników. Nie myl z **liderem przeglądu** (ogólna odpowiedzialność, decyduje kto, gdzie, kiedy) ani z **protokolantem** (zbiera notatki). W inspekcji moderator musi być osobą inną niż autor.'
+  },
+  {
+    id: 173, cat: 'statyczne',
+    q: 'Który typ przeglądu jest najbardziej formalny i obejmuje pełny proces wg ISO/IEC 20246?',
+    a: [
+      'Przegląd nieformalny',
+      'Przejrzenie (walkthrough)',
+      'Przegląd techniczny',
+      'Inspekcja'
+    ],
+    correct: 3,
+    expl: 'Sylabus 3.2.4 — od najmniej do najbardziej formalnego: **(1) Nieformalny** (brak procesu, brak dokumentacji), **(2) Przejrzenie** (prowadzony przez autora, edukacja + konsensus + ocena), **(3) Techniczny** (przeglądający to eksperci techniczni, moderator czuwa nad procesem), **(4) Inspekcja** — pełny proces, metryki do doskonalenia, autor NIE może być liderem ani protokolantem.'
+  },
+  {
+    id: 174, cat: 'statyczne',
+    q: 'Czym charakteryzuje się "przejrzenie" (walkthrough)?',
+    a: [
+      'Najbardziej formalny przegląd ze zbieraniem metryk',
+      'Przegląd nieformalny bez dokumentacji wyników',
+      'Przegląd prowadzony przez AUTORA produktu — może służyć ocenie jakości, edukacji przeglądających, osiągnięciu konsensusu, wygenerowaniu pomysłów, motywacji autorów do usprawnień, wykryciu anomalii',
+      'Przegląd wyłącznie kodu wykonywany automatycznie'
+    ],
+    correct: 2,
+    expl: 'Sylabus 3.2.4: **przejrzenie (walkthrough)** prowadzi **autor** — pokazuje produkt, prowadzi przez niego przeglądających. Cele: ocena jakości, wzrost zaufania, edukacja przeglądających, konsensus, generowanie pomysłów, motywacja do dalszych usprawnień, wykrycie anomalii. Przegląd indywidualny przed przejrzeniem jest możliwy, ale niekonieczny.'
+  },
+  {
+    id: 175, cat: 'statyczne',
+    q: 'Co odróżnia przegląd techniczny od inspekcji?',
+    a: [
+      'Przegląd techniczny jest bardziej formalny niż inspekcja',
+      'Inspekcja jest bardziej formalna, prowadzona zgodnie z pełnym procesem, zbiera metryki do doskonalenia procesów; w inspekcji autor NIE może być liderem ani protokolantem',
+      'Inspekcja jest mniej formalna',
+      'W przeglądzie technicznym autor nie może uczestniczyć'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.2.4: **przegląd techniczny** — eksperci techniczni jako przeglądający, moderator czuwa nad procesem, cele to konsensus techniczny, decyzje, ocena. **Inspekcja** — najbardziej formalna, pełny proces ISO/IEC 20246, zbiera **metryki** do doskonalenia cyklu wytwarzania, twarda zasada: autor NIE pełni roli lidera ani protokolanta (eliminacja stronniczości).'
+  },
+  {
+    id: 176, cat: 'statyczne',
+    q: 'Które stwierdzenie o czynnikach powodzenia przeglądu jest poprawne?',
+    a: [
+      'Ocena uczestników powinna być wprost jednym z celów przeglądu',
+      'Przeglądowi sprzyjają: jasne cele i mierzalne kryteria wyjścia (NIE ocena uczestników!), dobór typu przeglądu, mniejsze partie materiału, czas na przygotowanie, wsparcie kierownictwa, kultura organizacyjna, szkolenia',
+      'Przeglądy działają bez kultury i wsparcia kierownictwa',
+      'Brak ram czasowych pozwala na lepszy przegląd'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.2.5: czynniki sukcesu — (1) jasne cele i mierzalne kryteria wyjścia (uwaga: celem **NIE** powinna być ocena uczestników!), (2) dobór typu przeglądu pod kontekst, (3) mniejsze partie materiału (zapobiega utracie koncentracji), (4) przekazywanie informacji zwrotnych, (5) czas na przygotowanie, (6) wsparcie kierownictwa, (7) atmosfera nauki w kulturze, (8) przeszkolenie uczestników, (9) sprawny przebieg spotkań.'
+  },
+  {
+    id: 177, cat: 'statyczne',
+    q: 'Tester w fazie analizy backlog refinement w Scrumie kwestionuje wymaganie, prosi o doprecyzowanie i sprawdza, czy historyjka ma testowalne kryteria akceptacji. Jakie testowanie wykonuje?',
+    a: [
+      'Testowanie dynamiczne',
+      'Testowanie statyczne — przegląd produktu pracy (historyjki użytkownika) w trakcie example mapping/refinement',
+      'Testowanie regresji',
+      'Testowanie akceptacyjne'
+    ],
+    correct: 1,
+    expl: 'Sylabus 3.1: testowanie statyczne obejmuje też udział w sesjach **example mapping** i **backlog refinement** — testerzy używają technik przeglądu, by upewnić się że historyjki są kompletne, zrozumiałe, mają testowalne kryteria akceptacji (zgodne z Definition of Ready, 5.1.3). Zadawanie właściwych pytań to forma weryfikacji i walidacji **bez uruchamiania kodu**.'
+  },
+
+  // ===== CTFL ROZDZ. 4 — ANALIZA I PROJEKTOWANIE TESTÓW (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-4.1.1 do FL-4.5.3 (4 techniki BBT na poziomie K3 = stosować)
+
+  {
+    id: 178, cat: 'projektowanie',
+    q: 'Czym różnią się czarnoskrzynkowe i białoskrzynkowe techniki testowania?',
+    a: [
+      'Czarnoskrzynkowe wymagają dostępu do kodu, białoskrzynkowe nie',
+      'Czarnoskrzynkowe bazują na specyfikacji bez odwoływania się do struktury wewnętrznej; białoskrzynkowe analizują strukturę wewnętrzną (kod, architekturę, przepływy)',
+      'Czarnoskrzynkowe są tylko dla testerów manualnych, białoskrzynkowe dla automatów',
+      'Oba terminy są synonimami'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.1: **BBT (czarnoskrzynkowe)** = oparte na specyfikacji — niezależne od implementacji, więc nadal działają po refaktorze. **WBT (białoskrzynkowe)** = oparte na strukturze — wykrywają defekty wynikające z implementacji, ale przeoczają defekty wynikające z braków w wymaganiach. **Doświadczenie** = wiedza testera, intuicja, znajomość typowych błędów.'
+  },
+  {
+    id: 179, cat: 'projektowanie',
+    q: 'Klasa równoważności to:',
+    a: [
+      'Grupa testów wykonywanych równolegle',
+      'Zbiór wartości, które przedmiot testów powinien traktować w ten sam sposób — jeśli test jednej wartości wykrywa defekt, pozostałe też powinny',
+      'Zbiór testów o tym samym priorytecie',
+      'Grupa testerów o równych kompetencjach'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.1: klasa równoważności (EP) = zbiór wartości przetwarzanych w ten sam sposób. Założenie: wystarczy jeden test per klasa. **Klasa poprawna** = wartości akceptowane (wg specyfikacji), **niepoprawna** = wartości odrzucane lub takie, dla których specyfikacja nie definiuje przetwarzania. Klasy nie mogą się nakładać ani być pustymi zbiorami.'
+  },
+  {
+    id: 180, cat: 'projektowanie',
+    q: 'Pole formularza akceptuje wiek 18–65 (liczby całkowite). Ile klas równoważności wyznaczasz?',
+    a: [
+      '1 klasa poprawna',
+      '2 klasy: poprawna (18–65) i jedna niepoprawna',
+      '3 klasy: poprawna (18–65), niepoprawna <18, niepoprawna >65',
+      '4 klasy z każdą wartością osobno'
+    ],
+    correct: 2,
+    expl: 'Sylabus 4.2.1: dla zakresu liczbowego wyznaczamy **3 klasy** — jedną poprawną (18–65) i dwie niepoprawne (poniżej dolnej granicy i powyżej górnej). 100% pokrycia EP = test każdej klasy przynajmniej raz, czyli np. wartości {25, 10, 80}. Jeśli pole ma wiele wejść (np. wiek + kraj), używamy pokrycia "each choice" — każda klasa każdego zbioru co najmniej raz.'
+  },
+  {
+    id: 181, cat: 'projektowanie',
+    q: 'Analiza wartości brzegowych (BVA) skupia się na wartościach brzegowych klas, ponieważ:',
+    a: [
+      'Programiści celowo umieszczają tam defekty',
+      'Defekty często znajdują się tam, gdzie programiści zaimplementowali wartości brzegowe omyłkowo powyżej, poniżej zamierzonego położenia lub całkowicie je pominęli (off-by-one)',
+      'Wartości brzegowe są łatwiejsze do wpisania',
+      'Sylabus wymaga jej zastosowania zawsze'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.2: BVA stosuje się **tylko do klas uporządkowanych** i opiera się na założeniu, że jeśli dwa elementy należą do tej samej klasy, to wszystkie wartości między nimi też. Programiści często popełniają błędy off-by-one na granicach: `>` zamiast `>=`, pętla `< n` zamiast `<= n`, źle ustawione minimum/maksimum.'
+  },
+  {
+    id: 182, cat: 'projektowanie',
+    q: 'Czym różni się dwupunktowa od trójpunktowej analizy wartości brzegowych?',
+    a: [
+      'Dwupunktowa: sama wartość brzegowa + najbliższa sąsiednia (z drugiej klasy). Trójpunktowa: wartość brzegowa + OBIE sąsiednie wartości',
+      'Dwupunktowa wymaga 2 testów, trójpunktowa 6',
+      'Dwupunktowa stosuje się tylko do liczb, trójpunktowa do tekstu',
+      'Trójpunktowa jest mniej rygorystyczna'
+    ],
+    correct: 0,
+    expl: 'Sylabus 4.2.2: **2-point** (Craig, Myers) — dla każdej brzegowej: sama wartość + najbliższa sąsiednia z sąsiedniej klasy. **3-point** (Koomen, O\'Regan) — wartość brzegowa + obie sąsiednie. 3-point jest **bardziej rygorystyczna**: wykryje defekt typu "if (x <= 10)" zaimplementowane jako "if (x == 10)" (2-point z x=10 i x=11 nie wykryje, 3-point z x=9 wykryje).'
+  },
+  {
+    id: 183, cat: 'projektowanie',
+    q: 'Specyfikacja: hasło 8–20 znaków. Jakie wartości testujesz w 2-point BVA?',
+    a: [
+      '{8, 20}',
+      '{8, 14, 20}',
+      '{7, 8} dla dolnej granicy i {20, 21} dla górnej',
+      '{1, 50}'
+    ],
+    correct: 2,
+    expl: 'Sylabus 4.2.2 — **dwupunktowa BVA**: dla każdej brzegowej 2 elementy = sama wartość + najbliższa z sąsiedniej klasy. Dolna granica 8: testujemy {7, 8}. Górna granica 20: testujemy {20, 21}. **Trójpunktowa** dla tego samego: {7, 8, 9, 19, 20, 21}. Wartości środkowe (np. 14) pokrywają klasę równoważności — to nie BVA, tylko EP.'
+  },
+  {
+    id: 184, cat: 'projektowanie',
+    q: 'Tablica decyzyjna jest najodpowiedniejszą techniką dla testowania:',
+    a: [
+      'Wartości brzegowych w polu liczbowym',
+      'Złożonych reguł biznesowych — kombinacji warunków powodujących różne wyniki (np. rabaty zależne od kilku czynników, taryfy ubezpieczeniowe)',
+      'Pojedynczego pola tekstowego',
+      'Diagramu stanów aplikacji'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.3: tablice decyzyjne służą do testowania **implementacji wymagań systemowych** opisujących, jak kombinacje warunków produkują różne wyniki. Idealne dla reguł biznesowych typu: "klient VIP + zamówienie >1000 PLN + płatność kartą = rabat 15%". Każda kolumna = reguła decyzyjna (unikalna kombinacja warunków + akcji).'
+  },
+  {
+    id: 185, cat: 'projektowanie',
+    q: 'Elementem pokrycia w testowaniu w oparciu o tablicę decyzyjną są:',
+    a: [
+      'Wiersze tablicy (warunki)',
+      'Kolumny zawierające możliwe do spełnienia kombinacje warunków (reguły decyzyjne)',
+      'Tylko kolumny z akcją "wykonaj"',
+      'Wszystkie permutacje wartości warunków'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.3: elementy pokrycia = **kolumny** (reguły decyzyjne). 100% pokrycia = sprawdzenie wszystkich kolumn zawierających możliwe kombinacje. Tablicę można uprościć: (1) usuwając kolumny z niemożliwymi kombinacjami, (2) scalając kolumny gdzie część warunków nie wpływa na wynik ("nd" = nie dotyczy). W ograniczonych tablicach warunki są boolowskie (P/F), w uogólnionych mogą mieć wiele wartości.'
+  },
+  {
+    id: 186, cat: 'projektowanie',
+    q: 'Czym różni się tablica stanów od diagramu stanów?',
+    a: [
+      'Tablica jest mniej formalna',
+      'W przeciwieństwie do diagramu, tablica wyraźnie wskazuje niepoprawne przejścia (puste komórki) — wiersze to stany, kolumny to zdarzenia',
+      'Diagram nie pokazuje przejść',
+      'Tablica nie obsługuje warunków dozoru'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.4: **diagram stanów** pokazuje stany i przejścia w formie graficznej (notacja "zdarzenie [dozór] / akcja"). **Tablica stanów** = wiersze (stany) × kolumny (zdarzenia), wpisy = stan docelowy + akcja. Kluczowa różnica: tablica **wyraźnie wskazuje niepoprawne przejścia** (puste komórki), które na diagramie są niewidoczne.'
+  },
+  {
+    id: 187, cat: 'projektowanie',
+    q: 'Sylabus wymienia 3 kryteria pokrycia testowania przejść między stanami. Które jest NAJSŁABSZE?',
+    a: [
+      'Pokrycie wszystkich poprawnych przejść',
+      'Pokrycie wszystkich przejść (poprawnych i niepoprawnych)',
+      'Pokrycie wszystkich stanów',
+      'Pokrycie wszystkich zdarzeń'
+    ],
+    correct: 2,
+    expl: 'Sylabus 4.2.4 — od najsłabszego do najsilniejszego: (1) **Pokrycie stanów** — odwiedzić każdy stan; (2) **Pokrycie poprawnych przejść / 0-switch** — wykonać każde poprawne przejście co najmniej raz (najczęściej stosowane); (3) **Pokrycie wszystkich przejść** — w tym próby niepoprawnych przejść. (3) jest najsilniejsze; wymaga się go dla systemów krytycznych/bezpieczeństwa. Pokrycie poprawnych przejść implikuje pokrycie stanów (ale nie odwrotnie).'
+  },
+  {
+    id: 188, cat: 'projektowanie',
+    q: 'Pokrycie instrukcji (statement coverage) to:',
+    a: [
+      'Sprawdzenie wszystkich instrukcji wykonywalnych co najmniej raz przez przypadki testowe',
+      'Sprawdzenie tylko instrukcji deklarujących zmienne',
+      'Sprawdzenie wszystkich przypadków testowych',
+      'Pokrycie wszystkich linii kodu (w tym komentarzy)'
+    ],
+    correct: 0,
+    expl: 'Sylabus 4.3.1: pokrycie instrukcji = stosunek wykonanych instrukcji wykonywalnych do wszystkich instrukcji wykonywalnych. 100% gwarantuje że każda instrukcja zawierająca defekt zostanie **wykonana**, co może (ale nie musi!) wywołać awarię. Ograniczenia: nie pokrywa wszystkich gałęzi decyzyjnych; defekty zależne od danych (np. dzielenie przez zero) wymagają konkretnych wartości.'
+  },
+  {
+    id: 189, cat: 'projektowanie',
+    q: 'Relacja między pokryciem instrukcji a pokryciem gałęzi jest następująca:',
+    a: [
+      'Są niezależne',
+      'Pokrycie instrukcji implikuje pokrycie gałęzi',
+      'Pokrycie gałęzi subsumuje pokrycie instrukcji (100% gałęzi → 100% instrukcji, ale nie odwrotnie)',
+      'Oba kryteria są równoważne'
+    ],
+    correct: 2,
+    expl: 'Sylabus 4.3.2: pokrycie gałęzi **subsumuje** pokrycie instrukcji — każdy zbiór testów dający 100% gałęzi daje też 100% instrukcji, ale **nie odwrotnie**. Przykład: `if (x > 0) doSomething();` — jeden test z x=5 da 100% instrukcji, ale tylko 50% gałęzi (brak przypadku x<=0). Dlatego pokrycie gałęzi jest silniejszym kryterium.'
+  },
+  {
+    id: 190, cat: 'projektowanie',
+    q: 'Dla kodu poniżej — ile minimalnie testów potrzeba do 100% pokrycia gałęzi?',
+    a: [
+      '1',
+      '2',
+      '3',
+      '4'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.3.2: gałąź = przepływ sterowania między dwoma wierzchołkami w grafie przepływu. `if (a > 0)` ma 2 gałęzie (true/false). 100% pokrycia gałęzi = oba wyniki decyzji wykonane. Wystarczą **2 testy**: jeden z a>0 (np. a=5) → wypisze "positive"; drugi z a<=0 (np. a=-3) → pomija. Pokrycie instrukcji byłoby już 100% przy 1 teście (a=5), ale gałęzi już nie.',
+    code: 'function check(a) {\n  if (a > 0) {\n    console.log("positive");\n  }\n  return a;\n}'
+  },
+  {
+    id: 191, cat: 'projektowanie',
+    q: 'Główna zaleta białoskrzynkowych technik testowania to:',
+    a: [
+      'Są szybsze niż czarnoskrzynkowe',
+      'Uwzględniają faktyczną implementację, co ułatwia wykrycie defektów nawet gdy specyfikacja jest nieaktualna, niejednoznaczna lub niekompletna; dostarczają obiektywnej miary pokrycia kodu',
+      'Nie wymagają znajomości języka programowania',
+      'Wykrywają defekty wynikające z braków w wymaganiach'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.3.3: **zalety** WBT — (1) testowanie uwzględnia całą implementację, więc znajdzie defekty których specyfikacja nie opisuje, (2) obiektywne miary pokrycia (statement, branch). **Wada**: jeśli wymaganie nie zostało w ogóle zaimplementowane, WBT tego nie wykryje (potrzebne BBT/przeglądy). WBT można też stosować statycznie — np. dry-run pseudokodu przed uruchomieniem.'
+  },
+  {
+    id: 192, cat: 'projektowanie',
+    q: 'Czym jest "zgadywanie błędów" jako technika testowania?',
+    a: [
+      'Losowe wpisywanie wartości w nadziei na crash',
+      'Technika oparta na doświadczeniu: przewidywanie błędów, defektów i awarii na podstawie wiedzy testera o aplikacji, typowych pomyłkach programistów i awariach w podobnych systemach',
+      'Wyłącznie testowanie wartości NULL i pustych stringów',
+      'Generowanie danych testowych algorytmem AI'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.4.1: **zgadywanie błędów** to systematyczna technika oparta na doświadczeniu. Bazuje na wiedzy o: typowych defektach (NULL, empty, off-by-one, granice typów), wcześniejszych awariach w aplikacji, błędach typowych dla programistów. **Ataki usterek** (Whittaker) to formalizacja: lista potencjalnych defektów + testy ich wywołania. Często odkrywa defekty pomijane przez BBT/WBT.'
+  },
+  {
+    id: 193, cat: 'projektowanie',
+    q: 'Testowanie eksploracyjne polega na:',
+    a: [
+      'Wykonywaniu testów wg z góry przygotowanego skryptu',
+      'Równoczesnym projektowaniu, wykonywaniu i ocenie testów w czasie, gdy tester zapoznaje się z przedmiotem testów',
+      'Wyłącznie testowaniu UI',
+      'Pisaniu testów automatycznych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.4.2: eksploracyjne = projektowanie + wykonywanie + ocena **równocześnie**, w trakcie zapoznawania się z przedmiotem testów. Często organizowane jako **testowanie w sesjach (session-based)**: określony czas, **karta opisu testu (charter)** określająca cele, raport sesji. Przydatne gdy: specyfikacje są niepełne, jest presja czasu, jako uzupełnienie testów formalnych.'
+  },
+  {
+    id: 194, cat: 'projektowanie',
+    q: 'Testowanie w oparciu o listę kontrolną — które stwierdzenie jest poprawne?',
+    a: [
+      'Listy kontrolne zastępują przypadki testowe i nie wymagają aktualizacji',
+      'Elementy listy są często formułowane jako pytania; listy nie powinny zawierać elementów łatwych do automatycznego sprawdzenia ani zbyt ogólnych; trzeba je regularnie aktualizować ale nie pozwolić im zbytnio rozrastać się',
+      'Lista kontrolna jest formalniejsza od inspekcji',
+      'Można jej używać tylko do testów niefunkcjonalnych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.4.3: dobre listy kontrolne mają elementy w formie pytań możliwych do sprawdzenia pojedynczo, NIE są zbyt ogólne ani łatwe do automatyzacji, są aktualizowane (bo programiści uczą się unikać starych pomyłek = "zużycie" pestycydów). Przykład: 10 heurystyk użyteczności Nielsena (1994). Daje pewien stopień spójności testowania, ale dopuszcza zmienność wykonania.'
+  },
+  {
+    id: 195, cat: 'projektowanie',
+    q: 'Co oznacza "3C" w kontekście historyjki użytkownika (Jeffries)?',
+    a: [
+      'Code, Compile, Commit',
+      'Card (karta z opisem), Conversation (rozmowa o tym jak będzie używane), Confirmation (kryteria akceptacji)',
+      'Customer, Contract, Communication',
+      'Concept, Creation, Completion'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.5.1 (Jeffries 2000): **3 C** historyjki — (1) **Card** — nośnik z krótkim opisem, (2) **Conversation** — rozmowa wyjaśniająca jak oprogramowanie będzie używane (udokumentowana lub słowna), (3) **Confirmation** — kryteria akceptacji. Forma historyjki: "Jako [rola] chcę [cel] aby [wartość biznesowa]". Dobre historyjki spełniają **INVEST** — Independent, Negotiable, Valuable, Estimable, Small, Testable.'
+  },
+  {
+    id: 196, cat: 'projektowanie',
+    q: 'Akronim INVEST opisuje cechy dobrej historyjki użytkownika. Co oznacza "T"?',
+    a: [
+      'Tracked',
+      'Testable (testowalna)',
+      'Timeboxed',
+      'Templated'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.5.1 (Wake 2003): **INVEST** = **I**ndependent (niezależna od innych), **N**egotiable (negocjowalna), **V**aluable (wartościowa dla użytkownika), **E**stimable (oszacowalna), **S**mall (zwięzła, mieści się w iteracji), **T**estable (testowalna). Jeśli historyjka jest "nie do przetestowania", to znak, że jest niejednoznaczna, niekompletna lub nie odzwierciedla rzeczywistej potrzeby interesariusza.'
+  },
+  {
+    id: 197, cat: 'projektowanie',
+    q: 'Sylabus wymienia 2 najpopularniejsze formaty kryteriów akceptacji. Które?',
+    a: [
+      'Format JSON i XML',
+      'Format ukierunkowany na scenariusze (np. Given/When/Then) i format ukierunkowany na reguły (lista weryfikacyjna w punktach lub tabelaryczna)',
+      'Markdown i plain text',
+      'UML i BPMN'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.5.2: **scenariuszowy** (np. Given/When/Then z BDD, sekcja 2.1.3) — opisuje przykłady zachowań. **Regułowy** — lista warunków/wymagań do spełnienia w punktach lub tabeli (np. mapowanie wejść na oczekiwane wyjścia). Zespoły mogą używać innych formatów pod warunkiem że kryteria są **zdefiniowane i jednoznaczne**.'
+  },
+  {
+    id: 198, cat: 'projektowanie',
+    q: 'Jaki jest cel kryteriów akceptacji historyjki użytkownika?',
+    a: [
+      'Tylko formalność dla product ownera',
+      'Określenie zakresu historyjki, osiągnięcie konsensusu wśród interesariuszy, opisanie scenariuszy pozytywnych i negatywnych, podstawa dla testów akceptacyjnych, umożliwienie dokładnego planowania i szacowania',
+      'Zastąpienie przypadków testowych',
+      'Wyłącznie dokumentacja po wdrożeniu'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.5.2 wymienia 5 celów: (1) określenie zakresu historyjki (gdzie kończy się ta historyjka, a zaczyna kolejna), (2) konsensus wśród interesariuszy, (3) scenariusze pozytywne **i negatywne**, (4) podstawa dla testów akceptacyjnych (sekcja 4.5.3 — ATDD), (5) precyzyjne planowanie i szacowanie. Powstają zwykle w wyniku **rozmowy** (Conversation z 3C).'
+  },
+  {
+    id: 199, cat: 'projektowanie',
+    q: 'Czym jest ATDD (Acceptance Test-Driven Development)?',
+    a: [
+      'Pisanie testów modułowych przed kodem (to TDD)',
+      'Podejście typu "najpierw test": testy akceptacyjne tworzone są przed zaimplementowaniem historyjki, przez członków zespołu z różnych perspektyw (klient, programista, tester); ukierunkowane historyjką użytkownika',
+      'Automatyzacja regresji po wdrożeniu',
+      'Testowanie akceptacyjne wykonywane wyłącznie przez użytkowników końcowych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.5.3 (Adzic 2009): ATDD = "najpierw test" akceptacyjny. Proces: (1) **warsztaty tworzenia specyfikacji** — zespół analizuje historyjkę i AC, koryguje niejasności, (2) **tworzenie przypadków testowych** wg AC (cały zespół lub indywidualnie tester), (3) implementacja kodu który ma przejść testy. Testy traktowane jako "przykłady sposobu działania". Można je automatyzować → **wykonywalne wymagania**.'
+  },
+  {
+    id: 200, cat: 'projektowanie',
+    q: 'Jakie przypadki testowe powinny powstać w procesie ATDD?',
+    a: [
+      'Tylko pozytywne — sprawdzenie szczęśliwej ścieżki',
+      'Tylko negatywne — sprawdzenie obsługi błędów',
+      'Pierwsze pozytywne (sprawdzenie poprawnej ścieżki bez błędów), potem negatywne, na końcu pokrycie niefunkcjonalnych charakterystyk jakościowych (np. wydajność, użyteczność)',
+      'Wyłącznie testy automatyczne'
+    ],
+    correct: 2,
+    expl: 'Sylabus 4.5.3: pierwsze testy = **pozytywne** (potwierdzenie prawidłowego zachowania w "szczęśliwej ścieżce"). Potem **negatywne** (błędy, wyjątki, walidacja). Na końcu **niefunkcjonalne** (wydajność, użyteczność, bezpieczeństwo). Testy muszą pokrywać wszystkie charakterystyki historyjki, ale **nie wykraczać poza jej zakres**. Unikać duplikatów (dwóch testów na tę samą charakterystykę).'
+  },
+  {
+    id: 201, cat: 'projektowanie',
+    q: 'Pokrycie EP zwane "each choice" (każdy wybór) wymaga aby:',
+    a: [
+      'Wszystkie kombinacje klas wszystkich zbiorów zostały sprawdzone',
+      'Każda klasa z każdego zbioru klas (parametru) została sprawdzona co najmniej raz, niezależnie od kombinacji',
+      'Tylko klasy poprawne zostały sprawdzone',
+      'Każda wartość brzegowa była sprawdzona'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.1 (Ammann 2016): w wielu parametrach mamy kilka zbiorów klas (np. wiek × kraj × płeć). **Each choice** = każda klasa każdego zbioru pokryta przynajmniej raz, **bez wymagania kombinacji**. Najprostsze kryterium — daje znacznie mniej testów niż "all combinations". Przykład: 3 klasy wieku × 4 kraje × 2 płci → minimum 4 testy (max(3,4,2)), nie 24.'
+  },
+  {
+    id: 202, cat: 'projektowanie',
+    q: 'Decyzja `if (x <= 10)` została omyłkowo zaimplementowana jako `if (x == 10)`. Która technika BVA wykryje ten defekt?',
+    a: [
+      'Tylko dwupunktowa BVA (testy 10 i 11)',
+      'Trójpunktowa BVA — z wartością x=9 (sąsiednia z drugiej strony) wykryje, że dla x=9 system zachowa się błędnie',
+      'Żadna BVA nie wykryje tego defektu',
+      'Pokrycie instrukcji wystarczy'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.2 — klasyczny przykład z sylabusa. **2-point** dla granicy 10: testuje {10, 11}. Dla x=10: obie wersje zwracają true → defekt niewykryty. Dla x=11: obie zwracają false → niewykryty. **3-point**: testuje {9, 10, 11}. Dla x=9: poprawna wersja `<=10` zwraca true, błędna `==10` zwraca false → **wykrywa!** Dlatego 3-point jest rygorystyczniejsza.'
+  },
+  {
+    id: 203, cat: 'projektowanie',
+    q: 'System logowania: stan "Wylogowany" → po podaniu loginu/hasła → "Zalogowany" → po 30 min nieaktywności → "Wylogowany". Próba dostępu w stanie "Zalogowany" do panelu admin = przejście do "Panel admin". Które kryterium pokrycia jest najczęściej zalecane jako "domyślne" w sylabusie?',
+    a: [
+      'Pokrycie wszystkich stanów',
+      'Pokrycie poprawnych przejść (0-switch)',
+      'Pokrycie wszystkich przejść (w tym niepoprawnych)',
+      'Pokrycie wszystkich zdarzeń'
+    ],
+    correct: 1,
+    expl: 'Sylabus 4.2.4: **pokrycie poprawnych przejść** (0-switch coverage) — wykonać każde poprawne przejście co najmniej raz — jest **najczęściej stosowanym** kryterium, bo daje rozsądny balans (implikuje pokrycie wszystkich stanów). **Pokrycie wszystkich przejść** (w tym niepoprawnych, np. próba przejścia do "Panel admin" gdy jesteś wylogowany) zalecane dla systemów krytycznych/bezpieczeństwa.'
+  },
+
+  // ===== CTFL ROZDZ. 5 — ZARZĄDZANIE CZYNNOŚCIAMI TESTOWYMI (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-5.1.1 do FL-5.5.1
+
+  {
+    id: 204, cat: 'zarzadzanie',
+    q: 'Jaki jest główny cel planu testów?',
+    a: [
+      'Wyłącznie spełnienie wymogu formalnego/audytu',
+      'Udokumentować sposób i harmonogram osiągania celów testów, zapewnić zgodność czynności z kryteriami, umożliwić wymianę informacji z interesariuszami, wykazać zgodność z polityką testów',
+      'Zastąpić strategię testów',
+      'Lista przypadków testowych do wykonania'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.1: plan testów (1) dokumentuje sposób i harmonogram osiągania celów, (2) gwarantuje że czynności spełnią kryteria, (3) służy wymianie informacji z zespołem i interesariuszami, (4) wykazuje zgodność z polityką/strategią testów (lub uzasadnia odstępstwa). Sam proces planowania zmusza testerów do przemyślenia ryzyk, harmonogramów, kosztów. Szczegóły: ISO/IEC/IEEE 29119-3.'
+  },
+  {
+    id: 205, cat: 'zarzadzanie',
+    q: 'Które zagadnienie NIE jest typowo poruszane w planie testów?',
+    a: [
+      'Kontekst testowania (zakres, cele, podstawa testów)',
+      'Rejestr ryzyk i podejście do testowania',
+      'Kryteria wejścia/wyjścia, budżet, harmonogram',
+      'Szczegółowy kod implementacji testowanych funkcji'
+    ],
+    correct: 3,
+    expl: 'Sylabus 5.1.1: plan testów zawiera kontekst, założenia i ograniczenia, interesariuszy, formy wymiany informacji, rejestr ryzyk, **podejście do testowania** (poziomy, typy, techniki, kryteria wejścia/wyjścia, metryki, wymogi dot. danych i środowiska), budżet, harmonogram. Implementacja funkcjonalności należy do dokumentacji deweloperskiej, NIE do planu testów.'
+  },
+  {
+    id: 206, cat: 'zarzadzanie',
+    q: 'Jak różni się wkład testera w planowanie wydań od planowania iteracji w cyklu zwinnym?',
+    a: [
+      'Tester uczestniczy tylko w planowaniu wydań',
+      'W planowaniu wydań: pomoc w pisaniu historyjek, analiza ryzyka projektowego/produktowego, szacowanie pracochłonności na poziomie wydań. W planowaniu iteracji: szczegółowa analiza ryzyka, dzielenie historyjek na zadania testowe, doprecyzowanie aspektów funkcjonalnych/niefunkcjonalnych',
+      'Wkład w obu jest identyczny',
+      'Tester nie uczestniczy w planowaniu — to praca PO/SM'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.2: **planowanie wydań** (release planning) — perspektywa wprowadzenia produktu do eksploatacji, definiowanie backlogu produktu, dzielenie dużych historyjek. Tester: pomaga pisać historyjki + AC, analizuje ryzyko, szacuje testy. **Planowanie iteracji** — perspektywa zakończenia jednej iteracji. Tester: szczegółowa analiza ryzyka, dzieli historyjki na zadania testowe, doprecyzowuje aspekty funkcjonalne/niefunkcjonalne.'
+  },
+  {
+    id: 207, cat: 'zarzadzanie',
+    q: 'Czym różnią się kryteria wejścia od kryteriów wyjścia?',
+    a: [
+      'Kryteria wejścia = warunki PRZED rozpoczęciem czynności (np. dostępne środowisko, testowalne wymagania); kryteria wyjścia = warunki uznania czynności za zakończoną (pokrycie, brak defektów krytycznych, zaliczenie testów dymnych)',
+      'Wejścia stosuje się tylko w waterfall, wyjścia w agile',
+      'Wejścia to to samo co wyjścia',
+      'Wejścia opisują testerów, wyjścia narzędzia'
+    ],
+    correct: 0,
+    expl: 'Sylabus 5.1.3: **Wejścia (entry criteria)** — warunki wstępne, bez których czynność trudna/kosztowna/ryzykowna: dostępność zasobów, testowalna podstawa testów, początkowa jakość (testy dymne OK). **Wyjścia (exit criteria)** — warunki uznania czynności za skończoną: miary (pokrycie, gęstość defektów) + binarne tak/nie (wszystkie defekty zgłoszone). Przekroczenie terminu/budżetu też może być uznane za wyjście, jeśli interesariusze akceptują ryzyko.'
+  },
+  {
+    id: 208, cat: 'zarzadzanie',
+    q: 'W modelu zwinnym kryteria wyjścia nazywane są:',
+    a: [
+      'Definition of Ready (DoR)',
+      'Definition of Done (DoD)',
+      'Definition of Goals',
+      'Acceptance Criteria'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.3: w zwinnym **kryteria wyjścia = Definition of Done (DoD)** — obiektywne metryki uznania elementu za nadający się do przekazania do eksploatacji. **Kryteria wejścia = Definition of Ready (DoR)** — historyjka musi je spełnić, by rozpocząć prace programistyczne i czynności testowe. AC (Acceptance Criteria) to coś innego — warunki akceptacji konkretnej historyjki (sylabus 4.5.2).'
+  },
+  {
+    id: 209, cat: 'zarzadzanie',
+    q: 'Sylabus wymienia 4 techniki szacowania pracochłonności testów. Które?',
+    a: [
+      'Story points, T-shirt sizes, planning poker, magic estimation',
+      'Szacowanie na podstawie proporcji, ekstrapolacja, szerokopasmowa technika delficka, szacowanie trójpunktowe',
+      'Waterfall, agile, hybrid, devops',
+      'Top-down, bottom-up, sideways, diagonal'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.4 — 4 techniki: (1) **Proporcji** — używa proporcji z historycznych projektów (np. dev:test 3:2), (2) **Ekstrapolacja** — pomiary z wczesnych iteracji ekstrapolowane na kolejne, (3) **Szerokopasmowa delficka** — eksperci szacują niezależnie, omawiają odchylenia, powtarzają do konsensusu (wariant: poker planistyczny), (4) **Trójpunktowa** — optymistyczne/prawdopodobne/pesymistyczne, ważona średnia.'
+  },
+  {
+    id: 210, cat: 'zarzadzanie',
+    q: 'Szacowanie trójpunktowe: a=6 osobogodzin (optymistycznie), m=9 (prawdopodobnie), b=18 (pesymistycznie). Jaki jest szacunkowy nakład pracy E i odchylenie standardowe SD?',
+    a: [
+      'E = 11, SD = 2',
+      'E = 10, SD = 2',
+      'E = 9, SD = 12',
+      'E = 33, SD = 6'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.4 (przykład wprost z sylabusa): wzór **E = (a + 4m + b) / 6** = (6 + 36 + 18) / 6 = 60/6 = **10**. **SD = (b − a) / 6** = (18 − 6) / 6 = **2**. Wynik: 10 ± 2 osobogodzin (czyli zakres 8–12). Zaleta trójpunktowej: oprócz wartości otrzymujemy błąd pomiaru.'
+  },
+  {
+    id: 211, cat: 'zarzadzanie',
+    q: 'Sylabus opisuje 3 strategie ustalania priorytetów przypadków testowych. Które?',
+    a: [
+      'Ryzyko, pokrycie, wymagania',
+      'Pieniądze, czas, ludzie',
+      'Severity, priority, status',
+      'Manualne, automatyczne, eksploracyjne'
+    ],
+    correct: 0,
+    expl: 'Sylabus 5.1.5: (1) **Na podstawie ryzyka** — pierwszeństwo dla testów pokrywających najważniejsze ryzyka (5.2.3), (2) **Na podstawie pokrycia** — najpierw przypadki dające największe pokrycie (lub największe dodatkowe pokrycie), (3) **Na podstawie wymagań** — kolejność wynika z priorytetów wymagań nadanych przez interesariuszy. Praktyka: uwzględnić też zależności (test wyższego priorytetu może wymagać niższego priorytetu) i dostępność zasobów.'
+  },
+  {
+    id: 212, cat: 'zarzadzanie',
+    q: 'Piramida testów (Cohn 2009) ilustruje:',
+    a: [
+      'Hierarchię testerów w organizacji',
+      'Fakt, że różne testy mają różną szczegółowość — im wyższa warstwa, tym niższy poziom izolacji i dłuższy czas wykonania; w dolnych warstwach jest dużo małych, szybkich testów, w górnych — mało dużych, kompleksowych',
+      'Liczbę bugów na poziom',
+      'Koszt licencji narzędzi'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.6 (Cohn 2009): piramida pomaga w automatyzacji i estymacji. **Niskie warstwy** = dużo testów małych, szybkich, izolowanych (jednostki) — sprawdzają małe fragmenty. **Wysokie warstwy** = mało testów dużych, kompleksowych, długich (end-to-end). Klasyczny Cohn: testy modułowe / testy usług / testy interfejsu użytkownika. Inne warianty: modułowe / integracji / end-to-end.'
+  },
+  {
+    id: 213, cat: 'zarzadzanie',
+    q: 'Kwadranty testowe (Marick) klasyfikują testy po dwóch osiach. Które?',
+    a: [
+      'Manualne vs automatyczne; szybkie vs wolne',
+      'Cel: technologiczny vs biznesowy; wsparcie zespołu vs krytyka produktu',
+      'Funkcjonalne vs niefunkcjonalne; statyczne vs dynamiczne',
+      'Pozytywne vs negatywne; modułowe vs systemowe'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.1.7 (Marick 2003, Crispin 2008): osie to **cel** (technologiczny ↔ biznesowy) i **rola** (wsparcie zespołu ↔ krytyka produktu). **Q1** (tech + wsparcie) — modułowe, integracji modułów, automatyczne w CI. **Q2** (biznes + wsparcie) — funkcjonalne, AC, API, prototypy UX. **Q3** (biznes + krytyka) — eksploracyjne, użyteczność, UAT, manualne. **Q4** (tech + krytyka) — niefunkcjonalne, dymne, automatyczne.'
+  },
+  {
+    id: 214, cat: 'zarzadzanie',
+    q: 'Czym jest ryzyko w testowaniu i jakie parametry je charakteryzują?',
+    a: [
+      'Każdy defekt znaleziony w produkcji',
+      'Potencjalne zdarzenie/sytuacja powodująca niekorzystny skutek; charakteryzowane przez prawdopodobieństwo (>0, <1) i wpływ (szkodę)',
+      'Liczba bugów otwartych',
+      'Procent niezautomatyzowanych testów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.2.1: **ryzyko** = potencjalne zdarzenie/sytuacja powodująca niekorzystny skutek. Dwa parametry: (1) **prawdopodobieństwo** (większe niż 0, mniejsze niż 1 — jeśli 0 lub 1, to nie jest ryzyko tylko brak/pewność), (2) **wpływ** (szkoda, konsekwencja). **Poziom ryzyka** = miara wielkości, im wyższy tym ważniejsze działania zaradcze.'
+  },
+  {
+    id: 215, cat: 'zarzadzanie',
+    q: 'Sylabus wyróżnia 2 typy ryzyk istotnych dla testowania. Które przykłady pasują do RYZYK PROJEKTOWYCH?',
+    a: [
+      'Brakujące elementy funkcjonalności, niepoprawne obliczenia, awarie podczas wykonywania, słabe UX',
+      'Niedokładne oszacowania, konflikty kadrowe, niedostarczenie elementu przez dostawcę, niewystarczające umiejętności zespołu',
+      'Buffer overflow, SQL injection, XSS',
+      'Wszystkie defekty w UI'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.2.2: **Ryzyka projektowe** dotyczą zarządzania projektem — organizacyjne (opóźnienia, cięcia budżetu, oszacowania), kadrowe (umiejętności, konflikty, braki), techniczne (rozszerzenie zakresu, narzędzia), dostawców (upadłość, niedostarczenie). Wpływ na harmonogram/budżet/zakres. **Ryzyka produktowe** = charakterystyki jakościowe produktu (ISO 25010): brak funkcji, błędne obliczenia, awarie, UX, security.'
+  },
+  {
+    id: 216, cat: 'zarzadzanie',
+    q: 'Co obejmuje analiza ryzyka produktowego z perspektywy testowania?',
+    a: [
+      'Wyłącznie znalezienie wszystkich defektów',
+      'Identyfikacja ryzyka (wyczerpująca lista przez warsztaty/burze mózgów/wywiady/diagramy przyczynowo-skutkowe) + ocena ryzyka (klasyfikacja, prawdopodobieństwo, wpływ, priorytet, sposoby postępowania)',
+      'Tylko ocena ilościowa z pomnożeniem prawdopodobieństwa i wpływu',
+      'Wyłącznie wybór narzędzi testowych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.2.3: analiza ryzyka produktowego = **identyfikacja** (wyczerpująca lista, techniki: burza mózgów, warsztaty, wywiady, diagramy Ishikawy) + **ocena** (klasyfikacja, prawdopodobieństwo, wpływ, priorytet, sposoby postępowania). Ocena może być: **ilościowa** (P × I), **jakościowa** (matryca ryzyka), **mieszana**. Wcześnie w cyklu, by zminimalizować ryzyko rezydualne.'
+  },
+  {
+    id: 217, cat: 'zarzadzanie',
+    q: 'Wyniki analizy ryzyka produktowego są wykorzystywane do:',
+    a: [
+      'Wyłącznie określenia liczby testerów',
+      'Określenia zakresu testów, poziomów/typów testów, technik i pokrycia, oszacowania pracochłonności, ustalania priorytetów, decyzji o czynnościach poza testowaniem',
+      'Tylko wyboru języka programowania',
+      'Wyłącznie liczby przypadków testowych'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.2.3 wymienia 6 zastosowań: (1) określenie **zakresu** testów, (2) ustalenie **poziomów i typów** testów, (3) wskazanie **technik i pokrycia**, (4) **oszacowanie pracochłonności** per zadanie, (5) **priorytetyzacja** dla wczesnego wykrycia defektów krytycznych, (6) decyzja czy potrzebne są dodatkowe czynności (np. dodatkowe przeglądy, audyty bezpieczeństwa) poza samym testowaniem.'
+  },
+  {
+    id: 218, cat: 'zarzadzanie',
+    q: 'Które działania można podjąć w celu ŁAGODZENIA ryzyka produktowego poprzez testowanie?',
+    a: [
+      'Wytypowanie testerów o właściwym doświadczeniu, zapewnienie niezależności testowania, przeglądy i analiza statyczna, dobór technik i poziomów pokrycia, dobór typów testów (charakterystyki ryzykowne), testowanie dynamiczne w tym regresji',
+      'Tylko zwiększenie liczby testerów',
+      'Wyłącznie pisanie większej liczby raportów',
+      'Akceptacja każdego ryzyka bez działań'
+    ],
+    correct: 0,
+    expl: 'Sylabus 5.2.4: środki łagodzenia ryzyka przez testowanie (1) wytypowanie testerów z odpowiednim doświadczeniem, (2) niezależność testowania, (3) przeglądy + analiza statyczna, (4) odpowiednie techniki testowania + poziomy pokrycia, (5) odpowiednie typy testów dotyczące ryzykownych charakterystyk jakościowych, (6) dynamiczne + regresja. Poza testowaniem są też inne opcje: akceptacja ryzyka, przeniesienie, plany awaryjne (Veenendaal 2012).'
+  },
+  {
+    id: 219, cat: 'zarzadzanie',
+    q: 'Sylabus wymienia 6 kategorii metryk w testowaniu. Która z poniższych NIE jest jedną z nich?',
+    a: [
+      'Metryki postępu projektu (ukończenie zadań, użycie zasobów, pracochłonność)',
+      'Metryki postępu testów (postęp implementacji testów, środowiska, wykonane/niewykonane)',
+      'Metryki jakości produktu (dostępność, czas odpowiedzi, MTBF)',
+      'Metryki satysfakcji testerów w skali 1-10'
+    ],
+    correct: 3,
+    expl: 'Sylabus 5.3.1 — 6 grup metryk: (1) **postęp projektu** (ukończenie zadań, użycie zasobów), (2) **postęp testów** (postęp implementacji, środowiska, liczba/status przypadków, czas wykonywania), (3) **jakość produktu** (dostępność, czas odpowiedzi, MTBF), (4) **defekty** (liczba, priorytety, gęstość, odsetek wykrytych), (5) **ryzyko** (ryzyko rezydualne), (6) **pokrycie** (wymagań, kodu), oraz (7) **koszty**. Satysfakcji testerów sylabus nie wymienia.'
+  },
+  {
+    id: 220, cat: 'zarzadzanie',
+    q: 'Czym różnią się raport o postępie testów i sumaryczny raport z testów?',
+    a: [
+      'Sumaryczny jest krótszy',
+      'Raport o postępie: sporządzany regularnie (codziennie/tygodniowo), bieżące informacje dla nadzoru. Sumaryczny: po zakończeniu testowania danego poziomu/iteracji/projektu, ocena jakości wg pierwotnego planu, odstępstwa, niezłagodzone ryzyka, wnioski (lessons learned)',
+      'Sumaryczny pisze tester, postępu kierownik',
+      'Postępu jest tylko ustny, sumaryczny tylko pisemny'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.3.2: **Raport o postępie** (test progress) — regularny, dla bieżącego nadzoru. Zawiera: okres, postęp + odchylenia, utrudnienia, metryki, nowe/zmienione ryzyka, plany na kolejny okres. **Sumaryczny** (summary report) — na koniec poziomu/iteracji/projektu. Zawiera: ocena jakości wg planu i kryteriów wyjścia, odstępstwa, utrudnienia, metryki, niezłagodzone ryzyka, nieusunięte defekty, **lessons learned**. Szablony: ISO/IEC/IEEE 29119-3.'
+  },
+  {
+    id: 221, cat: 'zarzadzanie',
+    q: 'Które z poniższych są sposobami przekazywania informacji o statusie testowania?',
+    a: [
+      'Wyłącznie formalne raporty PDF',
+      'Słowna wymiana informacji, tablice wskaźników (dashboardy CI/CD, burndown), kanały elektroniczne (email/chat), dokumentacja elektroniczna, formalne raporty z testów',
+      'Tylko spotkania zespołu',
+      'Tylko tablice Kanban'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.3.3: dostępne opcje — (1) słowna wymiana (najczęściej w obrębie zespołu), (2) dashboardy (CI/CD, burndown, tablice zadań), (3) komunikacja elektroniczna (email, chat), (4) dokumentacja elektroniczna, (5) formalne raporty. Dla zespołów rozproszonych formalniejsze formy bywają lepsze. Treść dostosować do odbiorcy — różni interesariusze potrzebują różnych informacji.'
+  },
+  {
+    id: 222, cat: 'zarzadzanie',
+    q: 'W kontekście zarządzania konfiguracją (SCM), elementy konfiguracji to:',
+    a: [
+      'Tylko kod źródłowy',
+      'Plany testów, strategie testów, warunki testowe, przypadki, skrypty, wyniki testów, dzienniki testów, raporty — wszystko zatwierdzone do testowania staje się konfiguracją bazową i wymaga formalnego procesu zmiany',
+      'Wyłącznie pliki konfiguracji środowiska',
+      'Tylko narzędzia testowe'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.4.1: SCM = uporządkowany proces nadzoru nad produktami pracy testowania. **Elementy konfiguracji**: plany testów, strategie, warunki testowe, przypadki testowe, skrypty, wyniki, dzienniki, raporty. Zatwierdzone do testowania → **konfiguracja bazowa (baseline)** — zmiany tylko przez formalny proces. Pozwala odtworzyć wcześniejsze wyniki testów (zmodyfikowane elementy są dokumentowane). W DevOps zwykle automatyczne.'
+  },
+  {
+    id: 223, cat: 'zarzadzanie',
+    q: 'Jakie dane powinien zawierać raport o defekcie zarejestrowany podczas testowania dynamicznego?',
+    a: [
+      'Tylko opis bugu i screenshot',
+      'Jednoznaczny ID, tytuł + krótkie podsumowanie, data, autor, identyfikacja przedmiotu testów + środowiska, kontekst (przypadek testowy, faza, technika), opis awarii umożliwiający odtworzenie, oczekiwany vs rzeczywisty wynik, krytyczność, priorytet, status, odwołania',
+      'Tylko ID i status',
+      'Tylko logi z serwera'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.5.1 — pełna typowa zawartość raportu o defekcie: jednoznaczny ID, tytuł + podsumowanie, data + autor + rola, przedmiot testów + środowisko, kontekst (testcase, faza cyklu, technika, dane), opis umożliwiający odtworzenie (kroki, dzienniki, zrzuty), oczekiwany vs rzeczywisty wynik, **krytyczność** (severity — z punktu widzenia wymagań/interesariuszy), **priorytet** (priority — kolejność usunięcia), **status** (otwarty/odroczony/zamknięty/odrzucony/...), odwołania. ISO/IEC/IEEE 29119-3.'
+  },
+  {
+    id: 224, cat: 'zarzadzanie',
+    q: 'Jakie są typowe cele raportu o defekcie?',
+    a: [
+      'Wymierzanie kary autorom kodu',
+      'Dostarczenie odpowiedzialnym osobom informacji wystarczających do rozwiązania problemu, umożliwienie śledzenia jakości produktu, dostarczenie sugestii dotyczących usprawnień procesu wytwarzania i testowego',
+      'Tylko archiwizacja statystyk',
+      'Wyłącznie powiadomienie kierownictwa'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.5: cele raportu o defekcie to: (1) dać osobom odpowiedzialnym informacje do rozwiązania (deweloperowi do naprawy), (2) umożliwić **śledzenie jakości produktu**, (3) zasugerować **usprawnienia procesu** (gdzie powstał defekt i co zmienić, by zapobiegać podobnym). Nie chodzi o obwinianie — chodzi o ulepszanie. Ustalona procedura zarządzania defektami obowiązuje wszystkich.'
+  },
+  {
+    id: 225, cat: 'zarzadzanie',
+    q: 'Co oznacza "krytyczność" (severity) vs "priorytet" (priority) defektu?',
+    a: [
+      'To synonimy',
+      'Krytyczność = stopień wpływu defektu z punktu widzenia interesariuszy/wymagań; priorytet = pilność/kolejność usunięcia (może być różny od krytyczności)',
+      'Krytyczność to liczba użytkowników dotkniętych defektem',
+      'Priorytet = liczba zgłoszeń duplikatów'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.5.1: **Krytyczność (severity)** mówi o WPŁYWIE defektu — jak bardzo szkodzi z punktu widzenia wymagań/interesariuszy (np. krytyczny/poważny/niski). **Priorytet (priority)** mówi o KOLEJNOŚCI usunięcia. Defekt o wysokiej krytyczności może mieć niski priorytet (np. crash, ale w nieużywanej funkcji), i odwrotnie — literówka u CEO ma niską krytyczność, wysoki priorytet.'
+  },
+  {
+    id: 226, cat: 'zarzadzanie',
+    q: 'Anomalia zgłoszona w raporcie o defekcie:',
+    a: [
+      'Zawsze oznacza rzeczywisty defekt',
+      'Może okazać się rzeczywistym defektem, ale również czymś innym (np. rezultatem fałszywie pozytywnym, żądaniem zmiany funkcjonalności, nieporozumieniem co do specyfikacji)',
+      'Może być zgłoszona tylko podczas testowania dynamicznego',
+      'Nigdy nie jest false positive'
+    ],
+    correct: 1,
+    expl: 'Sylabus 5.5: choć w sylabusie mówi się o "defektach", zgłaszamy **anomalie** — mogą być rzeczywistymi defektami, ale też **false positivami** (problem testera/środowiska), żądaniami zmiany, błędem w specyfikacji. Rozstrzygnięcie następuje podczas rozpatrywania raportu (sortowania, triażu). Anomalie można zgłaszać w **dowolnej fazie** cyklu wytwarzania, także podczas testowania statycznego (zwłaszcza analizy statycznej).'
+  },
+  {
+    id: 227, cat: 'zarzadzanie',
+    q: 'Ustalanie priorytetów testów oparte na pokryciu występuje w 2 wariantach. W którym kolejność testów po pierwszym wykonaniu wybiera się tak, by dodać MAKSYMALNIE NOWE pokrycie?',
+    a: [
+      'Wariant "dodatkowego pokrycia"',
+      'Wariant "wszystkich kombinacji"',
+      'Wariant ryzykowny',
+      'Wariant wymagań'
+    ],
+    correct: 0,
+    expl: 'Sylabus 5.1.5: priorytetyzacja oparta na pokryciu — wariant podstawowy: pierwsze wykonywane są testy dające największe **bezwzględne** pokrycie. **Wariant "dodatkowego pokrycia"**: pierwszy test = max pokrycie, każdy kolejny = test dodający największe **dodatkowe** (incremental) pokrycie. Cel: jak najszybciej osiągnąć wymagane pokrycie przy minimalnej liczbie testów.'
+  },
+
+  // ===== CTFL ROZDZ. 6 — NARZĘDZIA TESTOWE (Sylabus v4.0.1) =====
+  // Pokrywa LO FL-6.1.1 i FL-6.2.1
+
+  {
+    id: 228, cat: 'narzedzia',
+    q: 'Sylabus CTFL v4.0.1 wymienia kilka kategorii narzędzi wspomagających testowanie. Która kategoria NIE jest tam wymieniona?',
+    a: [
+      'Narzędzia do zarządzania (cyklem wytwarzania, wymaganiami, testami, defektami, konfiguracją)',
+      'Narzędzia do testowania statycznego (przeglądy, analiza statyczna)',
+      'Narzędzia DevOps (CI/CD, pipeline, śledzenie przepływu pracy)',
+      'Narzędzia do automatycznej generacji kodu produkcyjnego'
+    ],
+    correct: 3,
+    expl: 'Sylabus 6.1 wymienia: (1) zarządzania (cykl wytwarzania, wymagania, testy, defekty, konfiguracja), (2) testowania statycznego, (3) projektowania i implementacji testów, (4) wykonywania testów i pomiaru pokrycia, (5) testowania niefunkcjonalnego, (6) DevOps, (7) wspomagające współpracę, (8) zwiększające skalowalność (wirtualizacja, kontenery), (9) inne (np. arkusz kalkulacyjny). Generowanie kodu produkcyjnego nie należy do narzędzi testowych.'
+  },
+  {
+    id: 229, cat: 'narzedzia',
+    q: 'Jaką rolę pełnią narzędzia do testowania niefunkcjonalnego?',
+    a: [
+      'Zastępują kompletnie testerów manualnych',
+      'Umożliwiają wykonywanie testów niefunkcjonalnych, które są trudne lub niemożliwe do wykonania w trybie manualnym (np. testy obciążeniowe, wydajności, bezpieczeństwa)',
+      'Generują automatycznie wymagania',
+      'Zarządzają backlogiem produktu'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.1: narzędzia niefunkcjonalne pozwalają wykonać testy **trudne lub niemożliwe manualnie** — np. wygenerowanie obciążenia 10 000 użytkowników jednocześnie (load testing), pomiar precyzyjnego czasu odpowiedzi, fuzzy testing, skanery bezpieczeństwa. Część charakterystyk ISO 25010 (wydajność, niezawodność) bez narzędzi jest praktycznie niemierzalna.'
+  },
+  {
+    id: 230, cat: 'narzedzia',
+    q: 'Maszyny wirtualne i konteneryzacja w kontekście testowania to przykład narzędzi:',
+    a: [
+      'Do testowania statycznego',
+      'Zwiększających skalowalność i standaryzację wdrażania (ułatwiają tworzenie spójnych, powtarzalnych środowisk testowych)',
+      'Do zarządzania wymaganiami',
+      'Do analizy statycznej kodu'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.1: **konteneryzacja** (Docker) i **wirtualizacja** (VM) zwiększają skalowalność i standaryzację wdrażania. Korzyść dla testerów: szybkie stawianie spójnych, izolowanych środowisk testowych identycznych jak produkcyjne. Eliminują problem "u mnie działa". Szczególnie ważne w DevOps / CI/CD — środowiska są kodem, wersjonowane razem z aplikacją.'
+  },
+  {
+    id: 231, cat: 'narzedzia',
+    q: 'Sam zakup narzędzia gwarantuje sukces automatyzacji testowania?',
+    a: [
+      'Tak — wystarczy kupić, zainstalować, działa',
+      'Nie. Sukces wymaga dodatkowego wysiłku (wdrożenie, utrzymanie, szkolenia) oraz analizy i łagodzenia ryzyk',
+      'Tak, jeśli narzędzie jest komercyjne',
+      'Tak, jeśli narzędzie jest open source'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.2: **sam zakup nie wystarczy**. Realne korzyści wymagają dodatkowego wysiłku: wdrożenie, utrzymanie skryptów, szkolenia zespołu. Trzeba też przeanalizować i łagodzić **ryzyka**: nierealistyczne oczekiwania, niedoszacowanie kosztów wdrożenia/utrzymania, uzależnienie od dostawcy, niedopasowanie do platformy. Klasyczny błąd: kupić Selenium/Cypress license i oczekiwać że "samo się zautomatyzuje".'
+  },
+  {
+    id: 232, cat: 'narzedzia',
+    q: 'Które z poniższych są TYPOWYMI KORZYŚCIAMI automatyzacji testów wg sylabusa?',
+    a: [
+      'Oszczędność czasu przez eliminację powtarzalnych czynności, zapobieganie błędom ludzkim, obiektywne pomiary (np. pokrycie), łatwiejszy dostęp do informacji o testach, krótszy czas testów, więcej czasu testerów na projektowanie nowych testów',
+      'Eliminacja potrzeby testowania manualnego',
+      'Gwarantowane zerowe defekty w produkcji',
+      'Brak konieczności pisania przypadków testowych'
+    ],
+    correct: 0,
+    expl: 'Sylabus 6.2: korzyści (1) oszczędność czasu (regresja, dane testowe, porównania, sprawdzanie standardów), (2) zapobieganie błędom ludzkim (spójność, powtarzalność), (3) obiektywne pomiary (np. pokrycie), (4) łatwiejszy dostęp do informacji (dashboardy, statystyki), (5) krótszy czas testów = szybszy feedback i time-to-market, (6) tester ma więcej czasu na **nowe, wnikliwsze** testy. Manualne wciąż potrzebne (UX, eksploracja).'
+  },
+  {
+    id: 233, cat: 'narzedzia',
+    q: 'Jakie są potencjalne RYZYKA związane z automatyzacją testów?',
+    a: [
+      'Brak ryzyk — automatyzacja zawsze działa',
+      'Nierealistyczne oczekiwania, niedoszacowanie kosztów wdrożenia/utrzymania, stosowanie tam gdzie lepsze byłoby manualne, nadmierne uzależnienie, uzależnienie od dostawcy, ryzyko porzucenia open-source, brak kompatybilności z platformą, niezgodność z prawem/normami',
+      'Tylko koszt licencji',
+      'Tylko wolniejsze działanie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.2: ryzyka (1) **nierealistyczne oczekiwania** (funkcjonalność, łatwość obsługi), (2) niedokładne **oszacowanie kosztów** wdrożenia i utrzymania skryptów, (3) stosowanie automatu tam gdzie lepiej działa manual (UX!), (4) **nadmierne uzależnienie** (zanik krytycznego myślenia), (5) uzależnienie od **dostawcy** (upadłość, koniec wsparcia), (6) porzucenie **open source**, (7) brak kompatybilności z platformą, (8) niespełnienie norm prawnych/bezpieczeństwa.'
+  },
+  {
+    id: 234, cat: 'narzedzia',
+    q: 'Tester planuje przepisać 50 testów eksploracyjnych UX na testy automatyczne, żeby "oszczędzić czas". Co jest złym pomysłem w tym podejściu?',
+    a: [
+      'Pomysł jest idealny',
+      'Testowanie eksploracyjne i użyteczności (UX) to obszary, w których lepiej sprawdza się testowanie MANUALNE — automatyzacja tu nie przynosi korzyści, a może maskować rzeczywiste problemy UX',
+      'Powinien przepisać 100 testów, nie 50',
+      'Eksploracyjne testy zawsze trzeba automatyzować'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.2 (ryzyko #3): "stosowanie narzędzia w sytuacjach, w których lepiej sprawdzi się testowanie manualne". Eksploracja, użyteczność, UX — wymagają oceny człowieka, kreatywności, intuicji. Automat sprawdzi czy przycisk istnieje, ale nie oceni czy jest "intuicyjny w użyciu". Sylabus 5.1.7 (kwadrant Q3) wskazuje wprost: UX, użyteczność, eksploracja są częściej manualne.'
+  },
+  {
+    id: 235, cat: 'narzedzia',
+    q: 'Co oznacza ryzyko "nadmiernego uzależnienia od narzędzia" wymienione w sylabusie?',
+    a: [
+      'Kupowanie wielu licencji',
+      'Lekceważenie potrzeby krytycznego myślenia testera — zakładanie, że "skoro automat green, to wszystko jest OK"',
+      'Używanie narzędzia codziennie',
+      'Płacenie za licencje rocznie'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.2: "nadmierne uzależnienie od narzędzia (np. lekceważenie potrzeby krytycznego myślenia)". Klasyczny problem: 1000 testów automatycznych przeszło, więc release\'ujemy. A testy mogły być źle zaprojektowane, pomijać krytyczne ścieżki, mieć false negatives. Tester musi nadal **krytycznie myśleć** o pokryciu, ryzyku, jakości — narzędzie wykonuje, ale nie myśli za testera.'
+  },
+  {
+    id: 236, cat: 'narzedzia',
+    q: 'Korzystanie z narzędzi open-source w testowaniu wiąże się ze szczególnym ryzykiem. Jakim?',
+    a: [
+      'Brak takiego ryzyka — open source jest zawsze lepszy',
+      'Projekt może zostać porzucony (brak dalszych aktualizacji), a elementy wewnętrzne mogą wymagać stosunkowo częstych aktualizacji w związku z dalszymi pracami rozwojowymi',
+      'Open source nie jest dozwolony w testowaniu',
+      'Wyższy koszt licencji'
+    ],
+    correct: 1,
+    expl: 'Sylabus 6.2: open-source może zostać **porzucony** (maintainer traci motywację, projekt umiera) — brak dalszych aktualizacji, security fixów, kompatybilności z nowymi wersjami platform. Dodatkowo elementy wewnętrzne (zależności) mogą wymagać częstych aktualizacji w miarę rozwoju. Z drugiej strony narzędzia komercyjne mają ryzyko upadłości dostawcy lub odsprzedaży komuś, kto świadczy słabej jakości wsparcie.'
+  },
+  {
+    id: 237, cat: 'narzedzia',
+    q: 'Które narzędzia testowe wspomagają konkretnie ZARZĄDZANIE konfiguracją (sekcja 5.4)?',
+    a: [
+      'Selenium, Cypress, Playwright',
+      'JMeter, k6, LoadRunner',
+      'Narzędzia do zarządzania (cyklem wytwarzania, wymaganiami, testami, defektami i konfiguracją) — np. systemy kontroli wersji, narzędzia ALM',
+      'Tylko arkusze kalkulacyjne'
+    ],
+    correct: 2,
+    expl: 'Sylabus 6.1: pierwsza kategoria — "narzędzia do zarządzania" pokrywa cały cykl wytwarzania (wymagania, testy, defekty **i konfiguracja**). Konkretnie: Git/SVN (kontrola wersji testaliów = elementów konfiguracji wg 5.4), Jira/ALM (testy, defekty), Jenkins/CI (konfiguracje builda). Selenium = wykonywanie testów. JMeter = niefunkcjonalne. Te kategorie się nie pokrywają.'
   }
 ];
 

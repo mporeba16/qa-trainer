@@ -22,11 +22,30 @@ export type Question = {
   id: number;
   cat: Category;
   q: string;
-  a: string[]; // dokładnie 4 odpowiedzi
-  correct: number; // index 0-3
+  a: string[]; // 4 lub 5 odpowiedzi (egzamin oficjalny ISTQB dopuszcza 5)
+  // single-correct: jeden index; multi-correct (egzamin ISTQB "wybierz DWIE"): tablica indeksów
+  correct: number | number[];
   expl: string;
-  code?: string; // opcjonalny blok kodu pokazywany w pytaniu
+  code?: string; // opcjonalny blok kodu / scenariusz pokazywany w pytaniu
 };
+
+// Typ odpowiedzi użytkownika: pojedynczy index (single-select), tablica (multi-select), null (brak)
+export type Answer = number | number[] | null;
+
+// Helper: czy odpowiedź użytkownika jest poprawna względem klucza pytania.
+// Dla multi-select wymaga DOKŁADNEGO dopasowania zbioru (all-or-nothing, zgodnie z ISTQB).
+export function isCorrectAnswer(answer: Answer, correct: number | number[]): boolean {
+  if (answer === null) return false;
+  if (Array.isArray(correct)) {
+    if (!Array.isArray(answer)) return false;
+    if (answer.length !== correct.length) return false;
+    const s1 = [...answer].sort((x, y) => x - y);
+    const s2 = [...correct].sort((x, y) => x - y);
+    return s1.every((v, i) => v === s2[i]);
+  }
+  if (Array.isArray(answer)) return false;
+  return answer === correct;
+}
 
 export type QuestionStat = {
   attempts: number;
@@ -35,36 +54,13 @@ export type QuestionStat = {
   lastCorrect: boolean;
 };
 
-export type GlobalStats = {
-  totalAnswered: number;
-  totalCorrect: number;
-  sessions: number;
-  examsAttempted: number;
-  examsPassed: number;
-  totalTimeSec: number;
-};
-
-export type Theme = 'light' | 'dark';
-
-// Rekord pojedynczej zakończonej sesji — feed dla wykresu trendu.
-export type SessionRecord = {
-  timestamp: number; // ms timestamp zakończenia
-  mode: QuizMode;
-  total: number;
-  correct: number;
-};
-
 // AppState = wszystko co persistujemy w localStorage (jeden klucz, jeden obiekt).
-// Theme trzymamy osobno przez useTheme — żeby toggle nie musiał ruszać całego stanu.
-// sessionHistory: optional dla backward compat — istniejący LS bez tego pola czyta jako undefined.
 export type AppState = {
-  stats: GlobalStats;
   questionStats: Record<number, QuestionStat>;
   wrongIds: number[];
-  sessionHistory?: SessionRecord[];
 };
 
-export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards';
+export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards' | 'official-exam';
 
 export type View = 'home' | 'setup' | 'quiz' | 'results';
 
@@ -77,8 +73,8 @@ export type SessionState = {
   mode: QuizMode;
   questions: Question[];
   currentIdx: number;
-  // answers[i] = wybór dla pytania o indeksie i (null = brak odpowiedzi)
-  answers: (number | null)[];
+  // answers[i] = wybór dla pytania o indeksie i (single index, tablica dla multi-select, lub null)
+  answers: Answer[];
   // czy bieżące pytanie zostało już zatwierdzone (tylko practice/review)
   answered: boolean;
   correctCount: number;
@@ -88,15 +84,6 @@ export type SessionState = {
 };
 
 export const DEFAULT_APP_STATE: AppState = {
-  stats: {
-    totalAnswered: 0,
-    totalCorrect: 0,
-    sessions: 0,
-    examsAttempted: 0,
-    examsPassed: 0,
-    totalTimeSec: 0,
-  },
   questionStats: {},
   wrongIds: [],
-  sessionHistory: [],
 };

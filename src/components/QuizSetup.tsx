@@ -9,7 +9,6 @@ type Props = {
   onStart: (config: SetupConfig) => void;
 };
 
-const COUNT_OPTIONS = [5, 10, 20, 30, 50] as const;
 const REVIEW_MAX = 30;
 
 const TITLES: Record<Props['mode'], string> = {
@@ -21,17 +20,13 @@ const TITLES: Record<Props['mode'], string> = {
 export default function QuizSetup({ mode, cert, wrongIdsCount, onCancel, onStart }: Props) {
   const isReview = mode === 'review';
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
-  const [count, setCount] = useState<number>(10);
 
-  // Ile pytań mamy faktycznie do dyspozycji dla aktualnych filtrów
+  // Cały zakres z wybranych kategorii (lub wszystkich, gdy nie wybrano żadnej)
   const availableCount = useMemo(() => {
     if (isReview) return Math.min(wrongIdsCount, REVIEW_MAX);
     if (selectedCats.length === 0) return cert.questions.length;
     return cert.questions.filter((q) => selectedCats.includes(q.cat)).length;
   }, [isReview, wrongIdsCount, selectedCats, cert.questions]);
-
-  const showAllAvailable =
-    availableCount > 0 && availableCount < COUNT_OPTIONS[0];
 
   const toggleCat = (cat: string) => {
     setSelectedCats((prev) =>
@@ -40,10 +35,9 @@ export default function QuizSetup({ mode, cert, wrongIdsCount, onCancel, onStart
   };
 
   const handleStart = () => {
-    const finalCount = Math.min(count, availableCount);
     onStart({
       categories: isReview ? [] : selectedCats,
-      count: finalCount,
+      count: availableCount,
     });
   };
 
@@ -58,34 +52,44 @@ export default function QuizSetup({ mode, cert, wrongIdsCount, onCancel, onStart
         ← Wróć
       </button>
 
-      <h1 className="text-2xl font-semibold text-text">{TITLES[mode]}</h1>
-      <p className="mt-1 text-sm text-text-muted">
+      <h1 className="text-2xl font-semibold tracking-tight text-text sm:text-3xl">{TITLES[mode]}</h1>
+      <p className="mt-2 text-sm leading-relaxed text-text-muted">
         {isReview
           ? `Tylko pytania, na które kiedyś odpowiedziałeś źle. Dostępnych: ${wrongIdsCount}.`
           : mode === 'flashcards'
-            ? 'Wybierz kategorie (puste = wszystkie) i liczbę fiszek. Sam oceniasz, czy wiedziałeś odpowiedź.'
-            : 'Wybierz kategorie (puste = wszystkie) i liczbę pytań.'}
+            ? 'Wybierz kategorie (puste = wszystkie). Sam oceniasz, czy wiedziałeś odpowiedź.'
+            : 'Wybierz kategorie (puste = wszystkie). Cały zakres zostanie odpytany.'}
       </p>
 
       {!isReview && (
-        <section className="mt-6">
-          <h2 className="mb-2 text-sm font-medium uppercase tracking-wide text-text-muted">
+        <section className="mt-8">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
             Kategorie
           </h2>
           <div className="flex flex-wrap gap-2">
             {catKeys.map((cat) => {
               const active = selectedCats.includes(cat);
+              const catCount = cert.questions.filter((q) => q.cat === cat).length;
               return (
                 <button
                   key={cat}
                   onClick={() => toggleCat(cat)}
                   className={
                     active
-                      ? 'rounded-full border border-accent bg-accent px-3 py-1.5 text-sm font-medium text-white'
-                      : 'rounded-full border border-border bg-surface px-3 py-1.5 text-sm text-text hover:bg-surface-2'
+                      ? 'inline-flex items-center gap-2 rounded-full border border-accent bg-accent/15 px-3.5 py-1.5 text-sm font-medium text-accent shadow-sm shadow-accent/10'
+                      : 'inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm text-text-muted transition-colors hover:border-border/60 hover:bg-surface-2 hover:text-text'
                   }
                 >
-                  {cert.categories[cat]}
+                  <span>{cert.categories[cat]}</span>
+                  <span
+                    className={
+                      active
+                        ? 'rounded-md bg-accent/20 px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-accent'
+                        : 'rounded-md bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] font-semibold tabular-nums text-text-muted'
+                    }
+                  >
+                    {catCount}
+                  </span>
                 </button>
               );
             })}
@@ -93,60 +97,23 @@ export default function QuizSetup({ mode, cert, wrongIdsCount, onCancel, onStart
         </section>
       )}
 
-      <section className="mt-6">
-        <h2 className="mb-2 text-sm font-medium uppercase tracking-wide text-text-muted">
-          Liczba pytań
-        </h2>
-        <div className="flex flex-wrap gap-2">
-          {COUNT_OPTIONS.map((c) => {
-            const disabled = c > availableCount;
-            const active = c === count && !disabled;
-            return (
-              <button
-                key={c}
-                onClick={() => setCount(c)}
-                disabled={disabled}
-                className={
-                  active
-                    ? 'rounded-md border border-accent bg-accent px-4 py-2 text-sm font-medium text-white'
-                    : 'rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface'
-                }
-              >
-                {c}
-              </button>
-            );
-          })}
-          {showAllAvailable && (
-            <button
-              onClick={() => setCount(availableCount)}
-              className={
-                count === availableCount
-                  ? 'rounded-md border border-accent bg-accent px-4 py-2 text-sm font-medium text-white'
-                  : 'rounded-md border border-border bg-surface px-4 py-2 text-sm text-text hover:bg-surface-2'
-              }
-            >
-              Wszystkie ({availableCount})
-            </button>
-          )}
-        </div>
-        {count > availableCount && availableCount > 0 && (
-          <p className="mt-2 text-xs text-warning">
-            Dostępnych jest tylko {availableCount} pytań — tyle zostanie wylosowane.
-          </p>
-        )}
-        {availableCount === 0 && (
-          <p className="mt-2 text-xs text-danger">
-            Brak pytań dla wybranych filtrów.
-          </p>
-        )}
-      </section>
+      <div className="mt-8 flex items-baseline gap-2">
+        <span className="text-xs uppercase tracking-wider text-text-muted">Do odpytania</span>
+        <span className="font-mono text-2xl font-bold tabular-nums text-text">{availableCount}</span>
+        <span className="text-sm text-text-muted">pyt.</span>
+      </div>
+      {availableCount === 0 && (
+        <p className="mt-2 text-xs text-danger">
+          Brak pytań dla wybranych filtrów.
+        </p>
+      )}
 
       <button
         onClick={handleStart}
         disabled={availableCount === 0}
-        className="mt-8 w-full rounded-md bg-accent px-4 py-3 text-sm font-medium text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+        className="mt-6 w-full rounded-lg bg-gradient-to-br from-accent to-accent-hover px-5 py-3 text-sm font-medium text-white shadow-lg shadow-accent/30 transition-all hover:shadow-xl hover:shadow-accent/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none sm:w-auto"
       >
-        {mode === 'flashcards' ? 'Zacznij fiszki' : 'Zacznij quiz'}
+        {mode === 'flashcards' ? 'Zacznij fiszki' : 'Zacznij quiz'} →
       </button>
     </main>
   );
