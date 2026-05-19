@@ -46,7 +46,7 @@ export default function QuizQuestion({
   onExit,
   rightHeader,
 }: Props) {
-  const isExam = mode === 'exam' || mode === 'official-exam';
+  const isExam = mode === 'exam' || mode === 'official-exam' || mode === 'official-exam-b' || mode === 'official-exam-c' || mode === 'official-exam-d';
   const showFeedback = !isExam && answered;
   const isLast = currentIdx === total - 1;
   const isMulti = Array.isArray(question.correct);
@@ -212,7 +212,7 @@ export default function QuizQuestion({
             className="rounded-lg bg-gradient-to-br from-accent to-accent-hover px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-accent/20 transition-all hover:shadow-lg hover:shadow-accent/30 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
           >
             {isLast
-              ? mode === 'official-exam'
+              ? mode === 'official-exam' || mode === 'official-exam-b' || mode === 'official-exam-c' || mode === 'official-exam-d'
                 ? 'Zakończ egzamin oficjalny'
                 : 'Zakończ egzamin'
               : 'Następne'}

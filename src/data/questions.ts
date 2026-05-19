@@ -2939,6 +2939,586 @@ export const QUESTIONS: Question[] = [
     ],
     correct: 2,
     expl: 'Sylabus 6.1: pierwsza kategoria — "narzędzia do zarządzania" pokrywa cały cykl wytwarzania (wymagania, testy, defekty **i konfiguracja**). Konkretnie: Git/SVN (kontrola wersji testaliów = elementów konfiguracji wg 5.4), Jira/ALM (testy, defekty), Jenkins/CI (konfiguracje builda). Selenium = wykonywanie testów. JMeter = niefunkcjonalne. Te kategorie się nie pokrywają.'
+  },
+
+  // ===== DEFECTS — pytania rekrutacyjne =====
+  {
+    id: 238, cat: 'defects',
+    q: 'Czym różni się smoke testing od sanity testing?',
+    a: [
+      'To synonimy',
+      'Smoke = szeroki, płytki test "czy build w ogóle działa" (np. login, główne menu). Sanity = wąski, głęboki test konkretnej funkcji po małej zmianie',
+      'Smoke = automatyczny, sanity = manualny',
+      'Smoke = przed release, sanity = po release'
+    ],
+    correct: 1,
+    expl: '**Smoke test** to "build verification" — kilka kluczowych ścieżek (app startuje, login działa, dashboard się ładuje). Sprawdza CZY warto w ogóle testować dalej. **Sanity test** to wąska weryfikacja: zmieniono walidację emaila — sprawdzam tylko ten ekran szczegółowo. Smoke = szeroki + płytki. Sanity = wąski + głęboki.'
+  },
+  {
+    id: 239, cat: 'defects',
+    q: 'Verification vs Validation — kluczowa różnica:',
+    a: [
+      'To synonimy',
+      'Verification: "czy budujemy produkt POPRAWNIE" (zgodnie ze specyfikacją). Validation: "czy budujemy POPRAWNY produkt" (czy zaspokaja potrzeby usera)',
+      'Verification = automaty, Validation = manualne',
+      'Verification = unit tests, Validation = E2E'
+    ],
+    correct: 1,
+    expl: '**Verification** sprawdza zgodność ze specyfikacją (czy formularz działa zgodnie z dokumentem). **Validation** sprawdza czy produkt zaspokaja rzeczywiste potrzeby usera (czy ten formularz to JEST to, czego potrzebuje user). Można mieć app perfekcyjnie zwerifikowaną i kompletnie nie-zaspokajającą potrzeb.'
+  },
+  {
+    id: 240, cat: 'defects',
+    q: 'Defect Removal Efficiency (DRE) to:',
+    a: [
+      'Czas naprawy defektu',
+      'Stosunek defektów wykrytych przed release do wszystkich (przed + po release). Wzór: DRE = defekty_przed / (defekty_przed + defekty_po) × 100%',
+      'Liczba defektów na sprint',
+      'Procent automatycznych testów'
+    ],
+    correct: 1,
+    expl: '**DRE** to KPI procesu QA. Przykład: w testach znaleziono 90 bugów, w produkcji wyciekło 10. DRE = 90/(90+10) = 90%. Im wyżej, tym skuteczniejszy proces testowy. Mierzone per release / per sprint. Komplementarne z defect leakage (10% w przykładzie).'
+  },
+  {
+    id: 241, cat: 'defects',
+    q: 'Technika "5 Why" w analizie defektów polega na:',
+    a: [
+      'Zadaniu 5 różnych pytań developerowi',
+      'Iteracyjnym pytaniu "dlaczego?" aż do odkrycia root cause (zwykle ~5 razy starczy)',
+      'Pomijaniu 5 najmniej ważnych bugów',
+      'Wypełnianiu 5-stopniowej ankiety'
+    ],
+    correct: 1,
+    expl: '**5 Why** (Toyota) odkrywa root cause przez iteracyjne "dlaczego". Przykład: 1) Czemu crash? Bo null pointer. 2) Czemu null? Bo API zwróciło pusty obiekt. 3) Czemu pusty? Bo timeout. 4) Czemu timeout? Bo wolna DB. 5) Czemu wolna? Bo brak indexu. Każde "czemu" prowadzi głębiej. Pomaga uniknąć łatania objawów.'
+  },
+  {
+    id: 242, cat: 'defects',
+    q: 'Znajdujesz buga, ale jest workaround. Jak zgłosisz?',
+    a: [
+      'Nie zgłaszam, skoro jest workaround',
+      'Zgłaszam bug, opisuję problem, kroki repro, oczekiwane vs aktualne — i w osobnej sekcji "Workaround:" dodaję obejście (przydatne dla supportu i innych testerów)',
+      'Zgłaszam tylko workaround',
+      'Daję workaround i nie wspominam o bug-u'
+    ],
+    correct: 1,
+    expl: 'Bug i workaround to różne rzeczy. **Bug** = problem do naprawienia (z severity/priority). **Workaround** = tymczasowe obejście dla supportu i innych testerów. Jedno nie zastępuje drugiego. Workaround w bug reporcie pozwala biznesowi i userom funkcjonować, podczas gdy bug czeka na fix.'
+  },
+
+  // ===== AGILE — pytania rekrutacyjne =====
+  {
+    id: 243, cat: 'agile',
+    q: 'Co to jest "Definition of Done" (DoD)?',
+    a: [
+      'Lista zakończonych sprintów',
+      'Kryteria, które user story MUSI spełniać żeby być uznana za "ukończoną" (np. kod + review + testy + dokumentacja + deploy na staging)',
+      'Plan demo dla klienta',
+      'Tylko "kod skończony"'
+    ],
+    correct: 1,
+    expl: '**DoD** to checklist dla "done": kod napisany, code review przeszedł, unit/integration tests napisane, manualnie przetestowane, AC spełnione, dokumentacja zaktualizowana, deploy na staging. Bez DoD każdy ma własną definicję "done" → bałagan. DoR (Ready) = co potrzeba przed startem. DoD = co potrzeba żeby skończyć.'
+  },
+  {
+    id: 244, cat: 'agile',
+    q: 'Praktyka "Three Amigos" w agile to:',
+    a: [
+      'Trzech najlepszych developerów',
+      'Spotkanie BA/PO + Dev + QA przy każdej user story — żeby wspólnie wypracować zrozumienie wymagań i AC',
+      'Trzech właścicieli produktu',
+      'Wybór 3 osób do daily'
+    ],
+    correct: 1,
+    expl: '**3 Amigos**: właściciel produktu (PERSPEKTYWA biznesu/usera) + developer (PERSPEKTYWA implementacji) + QA (PERSPEKTYWA "co może pójść źle") wspólnie omawiają story przed sprintem. Wczesne złapanie nieścisłości w AC, edge cases, technical risks. Często formalizowane jako 3 Cs: Card, Conversation, Confirmation.'
+  },
+  {
+    id: 245, cat: 'agile',
+    q: 'Velocity zespołu Scrum to:',
+    a: [
+      'Szybkość pisania kodu',
+      'Średnia liczba story pointów ukończonych w sprincie — używana do prognozowania jak dużo zespół zdąży w kolejnych sprintach',
+      'Frekwencja na daily',
+      'Liczba członków zespołu'
+    ],
+    correct: 1,
+    expl: '**Velocity** to średnia z ostatnich 3-5 sprintów. Jeśli zespół średnio kończy 30 SP/sprint, planujesz ~30 SP do następnego. Stabilizuje się po kilku sprintach. Velocity NIE jest do porównywania zespołów (skala SP jest subiektywna). Antypatern: kierownictwo presuje na "wyższe velocity" → zespół zaczyna inflować estymaty.'
+  },
+  {
+    id: 246, cat: 'agile',
+    q: 'Planning Poker służy do:',
+    a: [
+      'Gier zespołowych po pracy',
+      'Wspólnego estymowania user stories — każdy pokazuje kartę (Fibonacci: 1,2,3,5,8,13), dyskusja gdy duże różnice, ponowne głosowanie',
+      'Losowania kto robi co',
+      'Decyzji o release'
+    ],
+    correct: 1,
+    expl: '**Planning Poker**: każdy członek dostaje karty Fibonacci (1,2,3,5,8,13,21,?). PO opisuje story. Każdy WYBIERA kartę i POKAZUJE jednocześnie (nie wpływ na innych). Duże różnice (np. 1 i 13) → dyskusja "co widzisz że ja nie widzę?" → ponowne głosowanie. Wyłania ukryte założenia i ryzyka.'
+  },
+  {
+    id: 247, cat: 'agile',
+    q: 'Kryteria INVEST dotyczą dobrej user story. Co oznacza I-N-V-E-S-T?',
+    a: [
+      'Independent, Negotiable, Valuable, Estimable, Small, Testable',
+      'Important, New, Verified, Estimated, Simple, Tracked',
+      'Iterative, Numerous, Vital, Easy, Strict, Trustworthy',
+      'Internal, Native, Visual, External, Stable, Targeted'
+    ],
+    correct: 0,
+    expl: '**INVEST** (Bill Wake): **I**ndependent (niezależna od innych), **N**egotiable (do dyskusji), **V**aluable (wartość dla biznesu), **E**stimable (da się oszacować), **S**mall (mieści się w sprincie), **T**estable (mierzalne AC). Jeśli story nie spełnia INVEST → nie jest gotowa do sprintu. QA szczególnie patrzy na "Testable" — czy AC są jednoznaczne.'
+  },
+
+  // ===== API — pytania rekrutacyjne =====
+  {
+    id: 248, cat: 'api',
+    q: 'Kluczowa różnica między REST a SOAP:',
+    a: [
+      'REST używa HTTP, SOAP nie',
+      'REST = architektura (czasownik HTTP + URI, JSON), SOAP = protokół (XML envelope, WSDL, ściśle zdefiniowany kontrakt, własne specyfikacje WS-*)',
+      'REST = nowoczesny, SOAP = przestarzały i niedziałający',
+      'SOAP nie obsługuje JSON, REST nie obsługuje XML'
+    ],
+    correct: 1,
+    expl: '**REST**: lekka architektura, JSON, używa HTTP czasowników (GET/POST/PUT/DELETE), URI = zasób, brak ścisłego kontraktu (OpenAPI/Swagger opcjonalnie). **SOAP**: protokół z envelope XML, WSDL = kontrakt, własne WS-* (Security, Reliability), tylko POST przez HTTP, "ciężki". SOAP w bankowości/enterprise. REST dominuje w web/mobile.'
+  },
+  {
+    id: 249, cat: 'api',
+    q: 'GraphQL różni się od REST tym, że:',
+    a: [
+      'GraphQL działa tylko na PHP',
+      'Klient mówi DOKŁADNIE jakie pola chce w response (jedno endpointu na wszystko). REST: serwer decyduje co zwrócić, wiele endpointów',
+      'GraphQL jest mniej bezpieczny',
+      'GraphQL nie obsługuje uwierzytelnienia'
+    ],
+    correct: 1,
+    expl: '**REST**: GET /users/1 zwraca CAŁY obiekt, GET /users/1/orders to osobny request. **GraphQL**: POST /graphql z query mówiącym `{ user(id:1) { name, orders { total } } }` — jedna odpowiedź, dokładnie te pola. Plus: over/under-fetching znika, mobile-friendly. Minus: trudniejszy caching, N+1 problem, learning curve, security (complex queries → DOS).'
+  },
+  {
+    id: 250, cat: 'api',
+    q: 'JWT (JSON Web Token) składa się z 3 części oddzielonych kropką. Jakie?',
+    a: [
+      'Username.password.timestamp',
+      'Header (algorytm, typ) . Payload (claims: user_id, exp, role) . Signature (HMAC/RSA na header+payload)',
+      'IP.session_id.expires',
+      'Cookie.csrf.refresh_token'
+    ],
+    correct: 1,
+    expl: 'JWT = **base64(header).base64(payload).signature**. Header: `{alg:HS256, typ:JWT}`. Payload: claims (sub=user_id, exp=expiry, role, custom). Signature: HMAC(header+payload, secret) lub RSA. **WAŻNE**: payload jest tylko zakodowany base64 — KAŻDY może go odczytać (jwt.io). NIE wkładaj tam haseł/PII. Signature chroni przed modyfikacją, nie przed odczytem.'
+  },
+  {
+    id: 251, cat: 'api',
+    q: 'Po sukces POST /users (utworzenie usera) jaki status code zwróci najczęściej:',
+    a: [
+      '200 OK',
+      '201 Created — sukces + utworzono nowy zasób; często z nagłówkiem Location: /users/123',
+      '204 No Content',
+      '301 Moved Permanently'
+    ],
+    correct: 1,
+    expl: '**201 Created** dla utworzenia nowego zasobu (preferowane RESTowo). Zwykle z `Location: /users/123` (URL nowego zasobu) i body z utworzonym obiektem. **200 OK** akceptowalne ale mniej precyzyjne. **202 Accepted** = przyjęto, ale przetwarzanie asynchroniczne. **204 No Content** = sukces bez body (częste po DELETE, nie po POST tworzącym).'
+  },
+  {
+    id: 252, cat: 'api',
+    q: 'Czym różni się redirect 301 od 302?',
+    a: [
+      'To synonimy',
+      '301 = Moved PERMANENTLY (zmień zakładkę, przekaż SEO juice). 302 = Found / TEMPORARY (zachowaj oryginalny URL, np. login redirect)',
+      '301 = HTTPS, 302 = HTTP',
+      '301 = GET, 302 = POST'
+    ],
+    correct: 1,
+    expl: '**301**: trwała zmiana adresu, przeglądarka cache-uje na zawsze, search engines aktualizują indeks. **302** (lub nowsze 303/307): tymczasowe, klient nie cache-uje. Klasyczne 302: redirect na login gdy session expired, redirect na success page po POST. Testing: 301 łatwo testować — pamiętaj że cache w przeglądarce może mylić.'
+  },
+  {
+    id: 253, cat: 'api',
+    q: 'CORS preflight (OPTIONS) jest wysyłany przed właściwym requestem gdy:',
+    a: [
+      'Zawsze przy każdym requeście',
+      'Request "nieproste" (non-simple): zawiera nagłówki custom (np. Authorization), metodę inną niż GET/POST/HEAD, lub Content-Type inny niż application/x-www-form-urlencoded/multipart/text-plain',
+      'Tylko przy POST',
+      'Tylko gdy CORS jest wyłączony'
+    ],
+    correct: 1,
+    expl: 'Browser robi OPTIONS preflight by zapytać serwer "czy mogę zrobić ten cross-origin request?". Wymagany gdy: custom header (Authorization, X-*), method PUT/DELETE/PATCH, Content-Type: application/json. Serwer odpowiada `Access-Control-Allow-Origin`, `Allow-Methods`, `Allow-Headers`. Jeśli OK — browser wysyła właściwy request. Częsty bug: preflight failuje (np. brak nagłówków) → property request nigdy nie idzie.'
+  },
+  {
+    id: 254, cat: 'api',
+    q: 'Webhook vs polling — kluczowa różnica:',
+    a: [
+      'To synonimy',
+      'Polling = klient regularnie pyta serwer "są zmiany?". Webhook = serwer SAM woła klienta (POST na URL klienta) gdy coś się stanie. Webhook efektywniejszy, ale wymaga publicznego URL klienta',
+      'Webhook tylko dla GET, polling dla POST',
+      'Webhook działa tylko z REST'
+    ],
+    correct: 1,
+    expl: '**Polling**: klient co X sekund GET-uje "/status" — proste, ale marnuje zasoby, opóźnione. **Webhook** (callback URL): serwer POST-uje na URL klienta gdy zdarzenie (np. payment.success). Stripe, GitHub, Slack — wszędzie webhooki. Testing webhooków: ngrok / webhook.site / RequestBin do odbierania webhooków na lokalnej maszynie. Pamiętaj o retry logic i idempotency!'
+  },
+  {
+    id: 255, cat: 'api',
+    q: 'Po co mockowanie API w testach?',
+    a: [
+      'Żeby udawać że testujemy',
+      'Testować klienta NIEZALEŻNIE od backendu: gdy API nie gotowe, gdy chcemy odtworzyć edge case (500, timeout), gdy testujemy z izolacją (unit/component testy)',
+      'Tylko żeby było szybciej',
+      'Tylko żeby pominąć autoryzację'
+    ],
+    correct: 1,
+    expl: 'Mockowanie API: **frontend testy gdy backend jeszcze nie gotowy** (mock-first development), **odtworzenie edge case** (500, 429, timeout, malformed JSON) — trudno zmusić prawdziwy serwer. **Izolacja** — testujesz tylko warstwę klienta. Narzędzia: MSW (Mock Service Worker), WireMock, Mockoon, json-server, Postman Mock Servers. Ważne: testy E2E muszą używać prawdziwego API!'
+  },
+
+  // ===== WEB — pytania rekrutacyjne =====
+  {
+    id: 256, cat: 'web',
+    q: 'localStorage vs sessionStorage vs cookies — kluczowe różnice:',
+    a: [
+      'To synonimy',
+      'localStorage: ~5-10MB, persist after tab close, nie idzie do servera. sessionStorage: per tab, znika z tabem. Cookies: małe (~4KB), idą AUTOMATYCZNIE w każdym requeście do domeny, mogą być HttpOnly/Secure',
+      'Wszystkie idą do servera',
+      'Tylko cookies są bezpieczne'
+    ],
+    correct: 1,
+    expl: '**localStorage**: ~5-10MB, JS-accessible, persist after browser restart, **NIE jest wysyłane do servera** — używaj do client-side state. **sessionStorage**: jak localStorage ale tylko na czas otwartej karty. **Cookies**: ~4KB, **wysyłane w każdym requeście** do domeny, opcje HttpOnly (JS nie czyta), Secure (tylko HTTPS), SameSite (CSRF protection). Tokeny: HttpOnly cookie bezpieczniejsze niż localStorage (XSS).'
+  },
+  {
+    id: 257, cat: 'web',
+    q: 'Same-Origin Policy w przeglądarce oznacza:',
+    a: [
+      'Każda strona ma jeden serwer',
+      'Skrypt z origin A.com nie może czytać responses z innego origin B.com (origin = protocol + domain + port). CORS to mechanizm rozluźniający tę zasadę',
+      'Każda strona musi mieć HTTPS',
+      'Login musi być na tej samej stronie co aplikacja'
+    ],
+    correct: 1,
+    expl: '**Same-Origin Policy (SOP)** to fundamentalny security mechanism. Origin = scheme://domain:port. https://app.com:443 i http://app.com:80 to RÓŻNE origins. JS z origin A może wysyłać requesty do B, ale NIE może czytać response (chyba że B ma odpowiednie CORS headers). To powstrzymuje malicious site od kradzieży danych z innej domeny gdzie user jest zalogowany.'
+  },
+  {
+    id: 258, cat: 'web',
+    q: 'HTTPS różni się od HTTP tym, że szyfruje:',
+    a: [
+      'Tylko hasła i karty kredytowe',
+      'Cały ruch HTTP (body, headers, URL path, query params) między klientem a serwerem za pomocą TLS. Nie szyfruje: domeny (DNS), IP, rozmiaru paczek',
+      'Wszystko włącznie z DNS',
+      'Tylko response, nie request'
+    ],
+    correct: 1,
+    expl: 'TLS szyfruje **cały kontent HTTP** — headers (więc cookies, auth headers), body, URL path, query params. Atakujący na sieci widzi: TWOJEGO IP, IP serwera, domenę (przez DNS i SNI), przybliżony rozmiar paczek i czasy. **NIE widzi** treści. Implikacja dla testów: nawet GET /api/secret?token=XYZ jest szyfrowany, ALE token może wylądować w server logs!'
+  },
+  {
+    id: 259, cat: 'web',
+    q: 'Strona pokazuje stary content. Jak zrobić "twardy" refresh w Chrome/Firefox?',
+    a: [
+      'F5 lub Cmd+R (zwykły refresh — może użyć cache)',
+      'Ctrl+Shift+R (Cmd+Shift+R na Mac) — refresh OBCHODZĄCY cache, lub DevTools → Network → "Disable cache" + zwykły refresh',
+      'Restart komputera',
+      'Zmiana hasła w aplikacji'
+    ],
+    correct: 1,
+    expl: '**Ctrl+Shift+R** (Win/Linux) / **Cmd+Shift+R** (Mac) = hard refresh: ignoruje cache przeglądarki, pobiera świeże zasoby. Alternatywa: DevTools (F12) → Network tab → checkbox **"Disable cache"** + zwykły refresh (działa tylko gdy DevTools otwarte). Trzecia opcja: DevTools → Application → Clear storage. Przydatne gdy QA testuje deploy a widzi starą wersję.'
+  },
+  {
+    id: 260, cat: 'web',
+    q: 'CSS selectors vs XPath dla automatyzacji — co wybierzesz?',
+    a: [
+      'XPath zawsze, jest potężniejszy',
+      'CSS selectors gdy się da (szybsze, czytelniejsze, lepsze wsparcie). XPath gdy CSS nie wystarczy (selekcja po tekście np. //*[text()="Save"], traversing w górę DOM, complex predicates)',
+      'CSS tylko dla styles, XPath tylko dla testów',
+      'Zawsze ID, nigdy CSS/XPath'
+    ],
+    correct: 1,
+    expl: 'Priorytety lokatorów: **ID** (data-testid najlepsze) > **CSS** > **XPath** > tekst. CSS: `.btn[data-id="save"]`, `#login`, `input[type=email]`. Szybkie, czytelne, dobrze wspierane. XPath wygrywa gdy: selekcja po tekście (`//button[text()="Save"]`), iść w górę DOM (`parent::`), złożone predicates (`[position()=2]`). Anti-pattern: pełna ścieżka XPath (`/html/body/div[2]/...`) — kruche.'
+  },
+  {
+    id: 261, cat: 'web',
+    q: 'Responsive vs Adaptive design:',
+    a: [
+      'To synonimy',
+      'Responsive: jeden layout płynnie skaluje się (CSS media queries, flex, grid). Adaptive: kilka WYBRANYCH layoutów dla konkretnych breakpointów (np. mobile/tablet/desktop osobne)',
+      'Responsive tylko dla mobile',
+      'Adaptive tylko dla desktopu'
+    ],
+    correct: 1,
+    expl: '**Responsive** (1 layout, płynny): CSS dostosowuje się przez `@media (max-width: 768px)`, flexbox, grid. Lepsze pokrycie różnych rozdzielczości, mniej kodu. **Adaptive** (N layoutów, dyskretne): server (lub JS) wykrywa device i serwuje INNĄ wersję strony. Lepsze dla bardzo różnych use cases (np. desktop business app vs mobile consumer). QA testuje breakpointy: 320px, 375px, 768px, 1024px, 1440px.'
+  },
+  {
+    id: 262, cat: 'web',
+    q: 'Cross-browser testing — gdzie skoncentrujesz wysiłek?',
+    a: [
+      'Testuję na wszystkim co istnieje',
+      'Statystyki userów aplikacji (analytics): pokrycie top 80%+ rynku. Standardowo: Chrome, Safari (mobile + desktop dla Apple userów), Firefox, Edge. IE11 tylko jeśli klient enterprise wymaga',
+      'Tylko Chrome (większość userów)',
+      'Tylko Safari (najbardziej restrykcyjny)'
+    ],
+    correct: 1,
+    expl: 'Decyzja oparta o **dane**: sprawdź Google Analytics / Mixpanel aplikacji — które przeglądarki i wersje używa 80%+ userów. Typowo: Chrome (60%+), Safari (mobile dla iOS i desktop dla Apple), Firefox, Edge. **Mobile Safari** często sprawia najwięcej problemów (różni się od desktop, brak różnych API). IE11 zwykle deprecated. BrowserStack/LambdaTest do real device testing.'
+  },
+
+  // ===== TOOLS — pytania rekrutacyjne =====
+  {
+    id: 263, cat: 'tools',
+    q: 'Typowy workflow zadania w JIRA wygląda tak:',
+    a: [
+      'Zawsze tak samo we wszystkich firmach',
+      'Konfigurowalny, ale typowo: To Do → In Progress → In Review → QA / Testing → Done. Każda firma customizuje (np. dodaje Blocked, Ready for Deploy)',
+      'JIRA nie ma workflowów',
+      'Tylko Open/Closed'
+    ],
+    correct: 1,
+    expl: 'Workflow w JIRA = ścieżka statusów + dozwolone tranzycje. Typowy: **To Do** → **In Progress** (dev pracuje) → **In Review** (code review) → **QA** / **Testing** → **Done**. Bugi często dodatkowo: **Reopened** (gdy QA odrzuca fix). Inne typowe: **Blocked**, **Ready for Deploy**, **In UAT**. Statusy można konfigurować per project. JQL: `status = "In QA" AND assignee = currentUser()`.'
+  },
+  {
+    id: 264, cat: 'tools',
+    q: 'Git: clone vs fork, branch, merge vs rebase — szybko:',
+    a: [
+      'Wszystko jest tym samym',
+      'Clone = lokalna kopia repo. Fork = kopia repo na własne konto (GitHub). Branch = równoległa linia rozwoju. Merge = łączy historie (zachowuje merge commit). Rebase = przepisuje historię na top innej gałęzi (liniowa historia, ale modyfikuje commits)',
+      'Branch = oddział firmy',
+      'Merge zawsze lepszy od rebase'
+    ],
+    correct: 1,
+    expl: '**Clone** kopiuje repo lokalnie. **Fork** (GitHub feature) kopiuje na własne konto — używasz gdy chcesz contribute do cudzego repo. **Branch** to wskaźnik na commit (`git checkout -b feature/login`). **Merge** zachowuje historię obu gałęzi + tworzy merge commit. **Rebase** "przesuwa" commits na top innej gałęzi — czystsza historia, ale przepisuje hashe (NIE rebase po push do shared branch!).'
+  },
+  {
+    id: 265, cat: 'tools',
+    q: 'TestRail vs Xray (JIRA plugin) — kiedy używamy?',
+    a: [
+      'TestRail jest darmowy, Xray płatny',
+      'TestRail: dedicated test management tool (testcase repository, runs, milestones, reports). Xray: integracja z JIRA (testy = JIRA issues, test executions, traceability do user stories)',
+      'Tylko jeden z nich istnieje',
+      'TestRail tylko dla automatów, Xray dla manuala'
+    ],
+    correct: 1,
+    expl: '**TestRail** (stand-alone): osobne narzędzie, świetne raporty, czytelne struktury (Project → Suite → Section → Case), integracje z JIRA przez API. **Xray** (JIRA plugin): testy są typami issue (Test, Test Execution, Test Plan) — jeśli zespół żyje w JIRA, świetna traceability story → AC → testy → bugi. **Zephyr** podobny do Xray. Wybór: zależy od ekosystemu firmy.'
+  },
+  {
+    id: 266, cat: 'tools',
+    q: 'Newman służy do:',
+    a: [
+      'Generowania danych testowych',
+      'Uruchamiania kolekcji Postman z CLI (i w CI/CD) — `newman run collection.json -e env.json`',
+      'Tworzenia API w Node.js',
+      'Mockowania serwerów'
+    ],
+    correct: 1,
+    expl: '**Newman** to CLI runner kolekcji Postman. Workflow: 1) Pracujesz w Postman GUI. 2) Eksportujesz kolekcję + środowisko jako JSON. 3) `newman run collection.json -e env.json -r html,junit` w pipeline CI (Jenkins/GitHub Actions). 4) Reports w HTML/JUnit XML — łatwo integrować z Jenkins/Allure. Pozwala mieć Postmana w CI bez kupowania Postman Enterprise.'
+  },
+  {
+    id: 267, cat: 'tools',
+    q: 'BrowserStack / Sauce Labs / LambdaTest to:',
+    a: [
+      'Frameworks do automatyzacji',
+      'Cloud platformy z dostępem do real devices i przeglądarek (Selenium/Cypress hub) — testujesz aplikację na setkach kombinacji OS/browser/device bez własnego device lab',
+      'Narzędzia load testing',
+      'Tylko do mobile testing'
+    ],
+    correct: 1,
+    expl: '**Cloud device labs**: BrowserStack (najpopularniejszy), Sauce Labs, LambdaTest. Co dają: 1) Real devices iOS/Android (nie emulatory). 2) Wszystkie kombinacje browser/OS — IE11 na Win7, Safari 14 na iPhone X. 3) Live testing (zdalny pulpit) + automation (Selenium Grid endpoint). 4) Screenshots na wszystkich kombinacjach. Drogie ale taniej niż własny device lab. Free tier ograniczony.'
+  },
+  {
+    id: 268, cat: 'tools',
+    q: 'Confluence vs JIRA — który do czego?',
+    a: [
+      'Tylko jeden z nich istnieje',
+      'JIRA: zadania, sprinty, tracking (kanban/scrum boards). Confluence: dokumentacja, wiki, decision logs, test strategy, requirements, retro notes',
+      'Confluence dla devów, JIRA dla QA',
+      'JIRA dla projektów, Confluence dla maili'
+    ],
+    correct: 1,
+    expl: 'Oba od Atlassian, complementary: **JIRA** = work tracking (issues, sprints, boards, workflow). **Confluence** = knowledge base (markdown-like pages, hierarchia spaces, page templates). Testowanie: JIRA = bugi + user stories, Confluence = test strategy, test plan, retros, runbooks. Linki: w JIRA issue link do Confluence page; w Confluence embed JIRA issues. Razem tworzą "single source of truth" dla zespołu.'
+  },
+
+  // ===== TEST DESIGN — pytania rekrutacyjne =====
+  {
+    id: 269, cat: 'design',
+    q: 'Pairwise testing (all-pairs) służy do:',
+    a: [
+      'Testowania w parach (2 testerów)',
+      'Pokrywania WSZYSTKICH par kombinacji parametrów (zamiast pełnej kartezjańskiej). Bazuje na obserwacji: większość bugów pojawia się przez interakcję 2 parametrów, nie 3+',
+      'Testów wydajnościowych z 2 userami',
+      'Code review w parach'
+    ],
+    correct: 1,
+    expl: '**Pairwise** (all-pairs): zamiast testować WSZYSTKIE kombinacje (3 OS × 4 browser × 5 langs × 6 ról = 360!), pokryjemy tylko każdą **parę** wartości — wystarczy ~30 kombinacji. Bazuje na badaniach: 70-90% bugów to interakcja 2 parametrów. Narzędzia: ACTS, PICT, online generatory. Polega na założeniu o naturze defektów — nie zawsze pasuje (np. 3-way interactions w skomplikowanych formularzach).'
+  },
+  {
+    id: 270, cat: 'design',
+    q: 'Risk-based testing polega na:',
+    a: [
+      'Testowaniu tylko w bezpiecznym środowisku',
+      'Priorytetyzowaniu testów na podstawie ryzyka (prawdopodobieństwo defektu × wpływ). Najwięcej wysiłku na obszary z wysokim ryzykiem, mniej na low-risk',
+      'Unikanie ryzykownych testów',
+      'Testowanie tylko nowych feature\'ów'
+    ],
+    correct: 1,
+    expl: '**Risk = Likelihood × Impact**. Likelihood: częstotliwość zmian, złożoność, doświadczenie zespołu. Impact: użytkownicy dotknięci, koszt bugu, regulacje (np. financial). Risk matrix → priorytetyzacja: high/high — pełne testy + automaty; low/low — smoke wystarczy. Klasyk w embedded/medical/finance gdzie nie można testować wszystkiego. ISTQB to mocno promuje.'
+  },
+  {
+    id: 271, cat: 'design',
+    q: 'Test charter w testowaniu eksploracyjnym to:',
+    a: [
+      'Lista wszystkich możliwych test cases',
+      'Krótki dokument: misja sesji ("zbadać payment flow przez 90 min, focus: edge cases kart kredytowych"), techniki, area, czas — daje strukturę eksploracji bez sztywnego skryptu',
+      'Lista zatrudnionych testerów',
+      'Umowa z klientem na testy'
+    ],
+    correct: 1,
+    expl: 'Test charter (Session-Based Test Management / SBTM): "Explore [X] / With [Y] / To discover [Z]". Przykład: "Explore: shopping cart / With: różne kombinacje kuponów + walut / To discover: edge cases w obliczaniu kwoty". Czas: zwykle 60-120 min ("session"). Po sesji: session report (co testowano, znaleziska, pytania). Daje **focus** eksploracji bez sztywności skryptu.'
+  },
+  {
+    id: 272, cat: 'design',
+    q: 'Heurystyka SFDIPOT (J. Bach) pomaga generować test ideas. Co oznacza?',
+    a: [
+      'Structure, Function, Data, Interface, Platform, Operations, Time — 7 wymiarów do eksploracji produktu',
+      'Software, File, Data, Internet, Program, Online, Type',
+      'Random literki',
+      'Tylko Function and Data'
+    ],
+    correct: 0,
+    expl: '**SFDIPOT** = test ideas heurystyka: **S**tructure (z czego się składa — pliki, moduły, ekrany), **F**unction (co robi — features, opcje), **D**ata (jakie dane przetwarza — input/output/store), **I**nterface (API, UI, integracje), **P**latform (na czym działa — OS, browser, sieć), **O**perations (jak używany — actors, scenarios), **T**ime (timing, sekwencje, performance). Świetne na pytanie "przetestuj X" — daje strukturę.'
+  },
+  {
+    id: 273, cat: 'design',
+    q: 'Smoke vs Sanity vs Regression vs Retest — szybko porównanie:',
+    a: [
+      'Wszystkie to to samo',
+      'Smoke = "czy build działa w ogóle" (szeroko, płytko). Sanity = wąsko, głęboko po małej zmianie. Regression = "czy nic nie zepsuliśmy" w całej aplikacji. Retest = "czy ten konkretny bug naprawiony"',
+      'Smoke = ręczny, Sanity = automatyczny, Regression = oba',
+      'Wszystkie to typy unit testów'
+    ],
+    correct: 1,
+    expl: '**Smoke** (build verification): szeroki + płytki "czy app w ogóle żyje" — login, główne menu, kluczowe flows. Robisz przed każdym deploy. **Sanity**: wąski + głęboki "po zmianie X — czy ta jedna funkcja OK". **Regression**: po każdej zmianie — czy zmiana nie zepsuła starych feature\'ów (zwykle automaty). **Retest** (confirmation): konkretny scenariusz reprodukujący buga — czy fix działa.'
+  },
+  {
+    id: 274, cat: 'design',
+    q: 'Test Data Management — kluczowe wyzwanie:',
+    a: [
+      'Po prostu skopiować dane z produkcji',
+      'Realistyczne dane (reprezentujące produkcję) + zgodność z RODO (anonimizacja PII) + dane dla edge cases (boundary, negative) + odświeżanie między testami + dane dla automatów (deterministyczne)',
+      'Generowanie tylko losowych danych',
+      'Hardcoding wszystkiego'
+    ],
+    correct: 1,
+    expl: 'TDM to często niedoceniany obszar. Wyzwania: 1) **Realizm** — dane testowe powinny odzwierciedlać produkcję. 2) **Privacy** — RODO/GDPR zabrania używać prawdziwych PII (anonimizacja, syntetyczne dane). 3) **Edge cases** — celowe boundary values, polskie znaki, długie stringi. 4) **Refresh** — automaty potrzebują "czystych" danych przy każdym runie. 5) **Deterministic data** — automaty muszą być powtarzalne. Narzędzia: Faker, Bogus, Mockaroo, custom data builders.'
+  },
+
+  // ===== SOFT SKILLS — pytania rekrutacyjne =====
+  {
+    id: 275, cat: 'soft',
+    q: 'Pytanie "Opowiedz o sobie" na rozmowie — najlepsza struktura odpowiedzi:',
+    a: [
+      'Opowieść autobiograficzna od dzieciństwa',
+      'Present-Past-Future: aktualna rola (1 zdanie), kluczowe doświadczenia odpowiadające stanowisku (2-3 zdania), dlaczego ta firma teraz (1-2 zdania). Łącznie 60-90 sekund',
+      'Tylko hobby',
+      'Lista wszystkich technologii które znasz'
+    ],
+    correct: 1,
+    expl: 'Klasyczny **Present-Past-Future**. PRESENT: "Jestem manualnym QA z 3-letnim doświadczeniem w fintech, ostatnio fokus na API testing w Postmanie." PAST: "Wcześniej testowałem aplikacje mobile dla e-commerce — nauczyłem się X." FUTURE: "Szukam roli gdzie mogę zacząć więcej automatyzacji i pracować z większą skalą." Zwięźle, ukierunkowane na rolę, nie autobiografia. Ma być "elevator pitch".'
+  },
+  {
+    id: 276, cat: 'soft',
+    q: '"Czemu chcesz pracować akurat w naszej firmie?" — najlepsze podejście:',
+    a: [
+      'Bo szukam pracy',
+      'Konkrety o firmie (produkt, kultura, technologie, misja) wynikające z research-u + osobista więź (czemu to mnie pociąga). Pokaż że TO konkretne stanowisko, nie "byle gdzie"',
+      'Bo płacicie najlepiej',
+      'Bo to najbliżej domu'
+    ],
+    correct: 1,
+    expl: 'Recruiterzy chcą widzieć **intencję**. Zrób research: stronę firmy, LinkedIn pracowników, blog firmowy, GitHub. Konkretne haczyki: "Wasz blog post o migracji do GraphQL pokazał mi, że dbacie o engineering excellence" / "Misja tej firmy (X) rezonuje z moim doświadczeniem w Y". UNIKAJ: "bo dobre opinie", "bo growing company" — pokazuje brak research. Pieniądze: nigdy jako pierwszy argument.'
+  },
+  {
+    id: 277, cat: 'soft',
+    q: '"Jak radzisz sobie z presją czasową?" — co recruiter chce usłyszeć?',
+    a: [
+      '"Pracuję po nocach żeby wszystko zrobić"',
+      'Konkretny przykład: jak priorytetyzowałem (impact/risk), komunikowałem z teamem (early warning), negocjowałem scope. Pokazujesz proces, nie martyrologię',
+      '"Nie odczuwam presji"',
+      '"Po prostu robię szybciej"'
+    ],
+    correct: 1,
+    expl: 'Anti-pattern: "pracuję po nocach" — to RED FLAG dla mądrego managera (burnout, brak priorytetyzacji). Lepiej: 1) **Priorytetyzuj** — co MUSI być w release, co może być later. 2) **Komunikuj wcześnie** — manager musi wiedzieć o ryzykach, nie być zaskoczony. 3) **Negocjuj scope** — może niektóre rzeczy odłożyć. 4) Mierz **realistycznie** swoje możliwości. STAR method: konkretny przykład z poprzedniej pracy.'
+  },
+  {
+    id: 278, cat: 'soft',
+    q: '"Jak uczysz się nowych technologii?" — najlepsza odpowiedź:',
+    a: [
+      'Czekam aż firma mnie nauczy',
+      'Konkretne ostatnie przykłady: kurs/książka, side project, mentor/community, regularny "X% czasu na naukę". Pokazujesz **growth mindset** i samodzielność',
+      'Nie uczę się, znam już wszystko',
+      'Tylko gdy zmuszę mnie pracodawca'
+    ],
+    correct: 1,
+    expl: 'QA to dziedzina która szybko ewoluuje — recruiter chce widzieć growth mindset. Konkretnie: "W ostatnich 6 miesiącach przerobiłem kurs Test Automation University z Playwright, zbudowałem mały framework do testowania mojego side project-u na GitHub. Czytam Ministry of Testing i podcast Test Talks. Co tydzień ~5h na naukę po godzinach." Konkrety > "lubię się uczyć".'
+  },
+  {
+    id: 279, cat: 'soft',
+    q: 'Jak przyjmujesz konstruktywną krytykę?',
+    a: [
+      'Bronię się i tłumaczę dlaczego mam rację',
+      'Aktywne słuchanie (nie przerywam), pytam doprecyzowujące (jak to mogę poprawić?), nie biorę personalnie, działam (modyfikuję podejście, sprawdzam za miesiąc). Pokazujesz dojrzałość emocjonalną',
+      'Ignoruję i robię swoje',
+      'Płaczę i odchodzę'
+    ],
+    correct: 1,
+    expl: 'To pytanie sprawdza **dojrzałość** i **uczenie się**. Anti-pattern: defensywność, branie do siebie ("on mnie nie lubi"). Right approach: 1) **Słuchaj** aktywnie, nie przerywaj. 2) **Pytaj**: "Możesz dać konkretny przykład?" "Jak proponujesz to poprawić?". 3) **Oddziel** osobę od feedback-u — to o twoim BEHAVIOUR, nie o tobie. 4) **Reaguj**: zmień podejście, follow-up za miesiąc. STAR: konkretny przykład z przeszłości.'
+  },
+
+  // ===== MOBILE — pytania rekrutacyjne =====
+  {
+    id: 280, cat: 'mobile',
+    q: 'Native vs Hybrid vs Web app — kluczowe różnice:',
+    a: [
+      'To synonimy',
+      'Native (Swift/Kotlin): osobny kod per platforma, dostęp do wszystkich API, najszybsze. Hybrid (React Native, Flutter, Ionic): jeden kod → 2 platformy, pełen dostęp do native API. Web (PWA): działa w przeglądarce, ograniczony dostęp do device',
+      'Native = darmowe, Hybrid = płatne',
+      'Native tylko dla Apple, Hybrid tylko Android'
+    ],
+    correct: 1,
+    expl: '**Native** (Swift dla iOS, Kotlin/Java dla Android): osobny kod, pełen dostęp do API, najlepsza performance, ale 2x praca. **Hybrid** (React Native, Flutter): jeden kod, deploy na obie platformy, dostęp do native przez bridges. Trade-off: szybsza dev, ale czasem performance issues. **Web** (PWA): React/Vue w przeglądarce, ograniczony dostęp (geolocation tak, sensors trudniej), install na home screen możliwy. QA: testing differs! Native = device-specific bugs, Hybrid = bridge bugs, Web = browser quirks.'
+  },
+  {
+    id: 281, cat: 'mobile',
+    q: 'TestFlight (iOS) vs Internal Testing (Android) — jak się dystrybuuje buildy do testerów?',
+    a: [
+      'Wysyła się email z APK/IPA',
+      'iOS TestFlight: do 100 internal + 10k external testerów, build via Apple review (~24h dla external). Android Internal Testing: do 100 testerów po emailu, instant publish. Plus: Google Play Open Testing, Closed Testing dla większych grup',
+      'iOS i Android dystrybucja są identyczne',
+      'Tylko produkcja, brak testowych buildów'
+    ],
+    correct: 1,
+    expl: '**iOS TestFlight** (przez App Store Connect): 100 internal testerów (z firmy, instant), 10000 external (wymaga Beta App Review ~24h). Test build expires po 90 dniach. **Android Internal Testing**: do 100 testerów dodanych po Google account, instant publish. **Closed Testing**: większe grupy, ale czeka na review. **Open Testing**: każdy chętny z linku. QA flow: dev pushuje build → CI buduje → upload do TestFlight/Internal → mail do QA z linkiem.'
+  },
+  {
+    id: 282, cat: 'mobile',
+    q: 'Interruptions testing w mobile — co testujesz?',
+    a: [
+      'Tylko czy aplikacja crashuje',
+      'Zachowanie app gdy: dzwoni telefon, SMS, push notification, low battery alert, alarm, screen lock, change of network (WiFi → 4G), app w tle przez długo, OS update prompts',
+      'Tylko czy ekran się włącza',
+      'Tylko volume buttons'
+    ],
+    correct: 1,
+    expl: 'Mobile to mnóstwo **interrupts** które desktop nie ma. Testujesz: 1) Incoming call/SMS w trakcie krytycznej akcji (np. payment, recording). 2) Push notification (czy app handler je gdy w foreground). 3) Low battery / device locked. 4) Network change (WiFi → 4G → offline → back). 5) App backgrounded > 30 min (czy session expired? data preserved?). 6) Alarm / inny app przejmuje audio. 7) OS update / phone restart w trakcie. Każde to potencjalny crash/lost data.'
+  },
+  {
+    id: 283, cat: 'mobile',
+    q: 'Appium służy do:',
+    a: [
+      'Tylko Android automation',
+      'Cross-platform mobile automation (iOS + Android) używając Selenium-compatible API. Wspiera native, hybrid i mobile web. Pisze się raz w preferowanym języku (Java, Python, JS, Ruby)',
+      'Tylko web automation',
+      'Tylko backend testing'
+    ],
+    correct: 1,
+    expl: '**Appium** to "Selenium dla mobile". Cross-platform: jeden test script może działać na iOS i Android (z drobnymi different lokatorami). Wspiera **native** (XCUITest dla iOS, UiAutomator2 dla Android), **hybrid** (WebView), **mobile web** (Safari iOS, Chrome Android). Architecture: Appium server jako pośrednik między testem a urządzeniem. Inne: **Espresso** (Android native, in-process), **XCUITest** (iOS native). Appium = best dla cross-platform; Espresso/XCUITest = szybsze ale per platforma.'
+  },
+  {
+    id: 284, cat: 'mobile',
+    q: 'Accessibility na mobile — co testujesz?',
+    a: [
+      'Tylko czy app działa',
+      'Screen readers (VoiceOver iOS, TalkBack Android — czy elementy mają opisy?), kontrast, dynamic font size (jak działa app gdy user zwiększy systemowy font?), focus order, touch targets ≥44pt, color blindness, dark mode',
+      'Tylko ciemny motyw',
+      'Tylko emulator obsługuje accessibility'
+    ],
+    correct: 1,
+    expl: 'Mobile a11y: **VoiceOver** (iOS), **TalkBack** (Android) — czy każdy element ma sensowny content description? Włącz w Settings → Accessibility i przejdź flow. **Dynamic Type** (iOS) / **Font scale** (Android) — user może zwiększyć font do 200%; app musi się dostosować (nie obciąć tekstu, nie schować przycisków). **Touch targets** min 44x44pt (iOS) / 48dp (Android). **Color contrast** WCAG AA: 4.5:1 normal text. **Color blindness** — nie polegaj tylko na kolorze (np. error tylko czerwony — dodaj ikonę). Narzędzia: Accessibility Inspector (Xcode), Accessibility Scanner (Android).'
   }
 ];
 
