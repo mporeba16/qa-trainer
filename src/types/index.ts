@@ -60,7 +60,7 @@ export type AppState = {
   wrongIds: number[];
 };
 
-export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards' | 'official-exam';
+export type QuizMode = 'practice' | 'review' | 'exam' | 'flashcards' | 'official-exam' | 'official-exam-b' | 'official-exam-c' | 'official-exam-d';
 
 export type View = 'home' | 'setup' | 'quiz' | 'results';
 

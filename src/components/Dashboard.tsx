@@ -1,14 +1,15 @@
 import type { AppState, Cert, QuizMode } from '../types';
-import { OFFICIAL_EXAM_CONFIG } from '../data/exam-sample-a';
+import { OFFICIAL_EXAM_META, type ExamLetter } from '../data/exam-sample-meta';
 import CategoryBreakdown from './CategoryBreakdown';
 
 type Props = {
   appState: AppState;
   cert: Cert;
   onStartMode: (mode: QuizMode) => void;
+  loadingExamLetter: ExamLetter | null;
 };
 
-export default function Dashboard({ appState, cert, onStartMode }: Props) {
+export default function Dashboard({ appState, cert, onStartMode, loadingExamLetter }: Props) {
   const { wrongIds, questionStats } = appState;
   const reviewDisabled = wrongIds.length === 0;
 
@@ -57,12 +58,18 @@ export default function Dashboard({ appState, cert, onStartMode }: Props) {
       </section>
 
       <section className="mt-4">
-        <FeaturedCard
-          badge="OFICJALNE"
-          title="Egzamin ISTQB CTFL 4.0 — Zbiór A"
-          description={`Oryginalny przykładowy egzamin ISTQB (PL). ${OFFICIAL_EXAM_CONFIG.totalQuestions} pytań w oficjalnej kolejności, ${Math.round(OFFICIAL_EXAM_CONFIG.durationSec / 60)} min, próg ${OFFICIAL_EXAM_CONFIG.passPct}%. Niektóre pytania mają 5 opcji lub wymagają wyboru 2 odpowiedzi.`}
-          actionLabel="Rozpocznij egzamin oficjalny"
-          onClick={() => onStartMode('official-exam')}
+        <OfficialExamPanel
+          samples={[
+            { letter: 'A', mode: 'official-exam' },
+            { letter: 'B', mode: 'official-exam-b' },
+            { letter: 'C', mode: 'official-exam-c' },
+            { letter: 'D', mode: 'official-exam-d' },
+          ]}
+          count={OFFICIAL_EXAM_META.totalQuestions}
+          durationMin={Math.round(OFFICIAL_EXAM_META.durationSec / 60)}
+          passPct={OFFICIAL_EXAM_META.passPct}
+          onStart={onStartMode}
+          loadingLetter={loadingExamLetter}
         />
       </section>
 
@@ -114,34 +121,68 @@ function ModeCard({
   );
 }
 
-function FeaturedCard({
-  badge,
-  title,
-  description,
-  actionLabel,
-  onClick,
+type Sample = {
+  letter: ExamLetter;
+  mode: QuizMode;
+};
+
+function OfficialExamPanel({
+  samples,
+  count,
+  durationMin,
+  passPct,
+  onStart,
+  loadingLetter,
 }: {
-  badge: string;
-  title: string;
-  description: string;
-  actionLabel: string;
-  onClick: () => void;
+  samples: Sample[];
+  count: number;
+  durationMin: number;
+  passPct: number;
+  onStart: (mode: QuizMode) => void;
+  loadingLetter: ExamLetter | null;
 }) {
+  const anyLoading = loadingLetter !== null;
   return (
     <div className="relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 via-surface to-surface p-6">
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-accent/10 blur-3xl" />
       <div className="relative">
         <span className="inline-block rounded-full border border-accent/40 bg-accent/15 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">
-          {badge}
+          OFICJALNE EGZAMINY
         </span>
-        <h3 className="mt-3 text-lg font-semibold tracking-tight text-text sm:text-xl">{title}</h3>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-muted">{description}</p>
-        <button
-          onClick={onClick}
-          className="mt-5 rounded-lg bg-gradient-to-br from-accent to-accent-hover px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-accent/30 transition-all hover:shadow-xl hover:shadow-accent/40"
-        >
-          {actionLabel} →
-        </button>
+        <h3 className="mt-3 text-lg font-semibold tracking-tight text-text sm:text-xl">
+          Egzamin ISTQB CTFL 4.0 — zestawy przykładowe (PL)
+        </h3>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-text-muted">
+          Oryginalne pytania z oficjalnych egzaminów przykładowych ISTQB. Pytania w stałej kolejności,
+          z licznikiem czasu i progiem zdania {passPct}%. Bez podpowiedzi w trakcie.
+        </p>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {samples.map((s) => {
+            const isLoading = loadingLetter === s.letter;
+            return (
+              <button
+                key={s.letter}
+                onClick={() => onStart(s.mode)}
+                disabled={anyLoading}
+                aria-busy={isLoading}
+                className="group flex flex-col items-start gap-1 rounded-xl border border-accent/40 bg-gradient-to-br from-accent to-accent-hover px-4 py-3 text-left shadow-md shadow-accent/20 transition-all hover:shadow-lg hover:shadow-accent/30 disabled:cursor-wait disabled:opacity-60 disabled:shadow-none"
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className="text-sm font-semibold text-white">Zbiór {s.letter}</span>
+                  {isLoading ? (
+                    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  ) : (
+                    <span className="text-white transition-transform group-hover:translate-x-0.5">→</span>
+                  )}
+                </div>
+                <span className="font-mono text-[11px] tabular-nums text-white/80">
+                  {isLoading ? 'Ładowanie…' : `${count} pyt. · ${durationMin} min`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -54,7 +54,7 @@ export default function QuizResults({
 }: Props) {
   const total = questions.length;
   const pct = total === 0 ? 0 : Math.round((correctCount / total) * 100);
-  const isExam = mode === 'exam' || mode === 'official-exam';
+  const isExam = mode === 'exam' || mode === 'official-exam' || mode === 'official-exam-b' || mode === 'official-exam-c' || mode === 'official-exam-d';
   const passed = isExam && pct >= examPassPct;
 
   const mm = Math.floor(timeSec / 60);
@@ -142,7 +142,7 @@ export default function QuizResults({
       )}
 
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        {hasWrong && mode !== 'review' && mode !== 'official-exam' && (
+        {hasWrong && mode !== 'review' && mode !== 'official-exam' && mode !== 'official-exam-b' && mode !== 'official-exam-c' && mode !== 'official-exam-d' && (
           <button
             onClick={onReviewWrong}
             className="rounded-lg border border-border bg-surface px-5 py-2.5 text-sm font-medium text-text transition-colors hover:border-accent/40 hover:bg-accent/10 hover:text-accent"

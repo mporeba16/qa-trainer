@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import type {
   AppState,
   Cert,
@@ -9,7 +9,7 @@ import type {
 } from './types';
 import { DEFAULT_APP_STATE, isCorrectAnswer } from './types';
 import { stateKeyForCert } from './data';
-import { EXAM_SAMPLE_A, OFFICIAL_EXAM_CONFIG } from './data/exam-sample-a';
+import { OFFICIAL_EXAM_META, loadExamSample, type ExamLetter } from './data/exam-sample-meta';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useAuth } from './hooks/useAuth';
 import { shuffle, shuffleAnswers } from './utils/shuffle';
@@ -20,21 +20,35 @@ import {
 } from './utils/syncState';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
-import QuizSetup from './components/QuizSetup';
 import QuizQuestion from './components/QuizQuestion';
-import QuizResults from './components/QuizResults';
-import Flashcard from './components/Flashcard';
 import Timer from './components/Timer';
 import ConfirmModal from './components/ConfirmModal';
 import Toast from './components/Toast';
 import InstallPrompt from './components/InstallPrompt';
-import LoginModal from './components/LoginModal';
+import UpdatePrompt from './components/UpdatePrompt';
+
+// Rzadziej używane komponenty — lazy-loadowane żeby zmniejszyć initial bundle.
+// Każdy idzie do osobnego chunku, pobieranego dopiero gdy widok faktycznie potrzebuje.
+const QuizSetup = lazy(() => import('./components/QuizSetup'));
+const QuizResults = lazy(() => import('./components/QuizResults'));
+const Flashcard = lazy(() => import('./components/Flashcard'));
+const LoginModal = lazy(() => import('./components/LoginModal'));
+const OnboardingModal = lazy(() => import('./components/OnboardingModal'));
 
 const REVIEW_MAX = 30;
 const TOAST_MS = 3000;
 const SYNC_DEBOUNCE_MS = 1500;
 
 type ToastState = { message: string; type: 'success' | 'danger' };
+
+// Mapowanie mode → litera zbioru (dla lazy-loadowanych oficjalnych egzaminów).
+function officialExamLetter(mode: QuizMode): ExamLetter | null {
+  if (mode === 'official-exam') return 'A';
+  if (mode === 'official-exam-b') return 'B';
+  if (mode === 'official-exam-c') return 'C';
+  if (mode === 'official-exam-d') return 'D';
+  return null;
+}
 
 type Props = {
   cert: Cert;
@@ -51,8 +65,18 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     user,
     enabled: authEnabled,
     signInWithMagicLink,
+    signInWithGoogle,
     signOut,
   } = useAuth();
+
+  // Flag onboardingu: true gdy user już zobaczył kartę powitalną (zalogował się
+  // albo świadomie kliknął "Kontynuuj bez logowania"). Nie pytamy ponownie.
+  const [onboarded, setOnboarded] = useLocalStorage<boolean>(
+    'qa_trainer_onboarded_v1',
+    false,
+  );
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [googleError, setGoogleError] = useState<string | null>(null);
 
   const [view, setView] = useState<View>('home');
   const [pendingMode, setPendingMode] = useState<QuizMode | null>(null);
@@ -61,6 +85,8 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   const [exitOpen, setExitOpen] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
   const toastTimerRef = useRef<number | null>(null);
+  // Loading state dla lazy-loadowanego oficjalnego egzaminu (litera A/B/C/D albo null).
+  const [loadingExamLetter, setLoadingExamLetter] = useState<ExamLetter | null>(null);
 
   // Auth/sync state
   const [loginOpen, setLoginOpen] = useState(false);
@@ -146,25 +172,72 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     showToast('Wylogowano');
   };
 
+  // Po zalogowaniu automatycznie zamykamy onboarding (i nie pokazujemy więcej).
+  useEffect(() => {
+    if (user && !onboarded) setOnboarded(true);
+  }, [user, onboarded, setOnboarded]);
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setGoogleError(null);
+    const { error } = await signInWithGoogle();
+    if (error) {
+      setGoogleLoading(false);
+      setGoogleError(error);
+    }
+    // Brak else — Supabase robi redirect; po powrocie user się ustawi
+    // (onAuthStateChange) i useEffect powyżej ustawi onboarded=true.
+    return { error };
+  };
+
+  const handleOnboardingSkip = () => {
+    setOnboarded(true);
+    setGoogleError(null);
+  };
+
+  const handleOnboardingEmail = () => {
+    // Zamykamy onboarding (oznaczamy obeznanego) i otwieramy klasyczny LoginModal.
+    setOnboarded(true);
+    setLoginOpen(true);
+  };
+
+  // Pokaż onboarding tylko gdy: auth jest skonfigurowany + user nieosiągnięty
+  // + flag w LS nieustawiony. Brak useState lokalnego — czytamy z LS.
+  const onboardingOpen = authEnabled && !user && !onboarded;
+
   // --- Start ---
   const startMode = (mode: QuizMode) => {
     if (mode === 'exam') {
       beginQuiz('exam', { categories: [], count: cert.examCount });
       return;
     }
-    if (mode === 'official-exam') {
-      // Oficjalny egzamin: stała pula, stała kolejność, brak setupu
-      setSession({
-        mode: 'official-exam',
-        questions: EXAM_SAMPLE_A,
-        currentIdx: 0,
-        answers: new Array(EXAM_SAMPLE_A.length).fill(null),
-        answered: false,
-        correctCount: 0,
-        wrongCount: 0,
-        startTime: Date.now(),
-      });
-      setView('quiz');
+    // Oficjalny egzamin (A/B/C/D): stała pula, stała kolejność, brak setupu.
+    // Pytania lazy-loadowane przez dynamic import — chunk per zbiór.
+    const letter = officialExamLetter(mode);
+    if (letter !== null) {
+      if (loadingExamLetter !== null) return; // Zapobiegamy podwójnemu kliknięciu.
+      setLoadingExamLetter(letter);
+      loadExamSample(letter)
+        .then((questions) => {
+          setSession({
+            mode,
+            questions,
+            currentIdx: 0,
+            answers: new Array(questions.length).fill(null),
+            answered: false,
+            correctCount: 0,
+            wrongCount: 0,
+            startTime: Date.now(),
+          });
+          setView('quiz');
+        })
+        .catch((err) => {
+          console.warn('[exam] load failed:', err);
+          showToast('Nie udało się załadować egzaminu', 'danger');
+        })
+        .finally(() => {
+          setLoadingExamLetter(null);
+        });
       return;
     }
     if (mode === 'review' && appState.wrongIds.length === 0) return;
@@ -249,7 +322,7 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
 
   const submitAnswer = () => {
     if (!session || session.answered) return;
-    if (session.mode === 'exam' || session.mode === 'official-exam') return;
+    if (session.mode === 'exam' || session.mode === 'official-exam' || session.mode === 'official-exam-b' || session.mode === 'official-exam-c' || session.mode === 'official-exam-d') return;
     const cur = session.answers[session.currentIdx];
     if (cur === null) return;
     const q = session.questions[session.currentIdx];
@@ -272,7 +345,7 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       if (!s || s.endTime) return s;
       let correctCount = s.correctCount;
       let wrongCount = s.wrongCount;
-      const isAnyExam = s.mode === 'exam' || s.mode === 'official-exam';
+      const isAnyExam = s.mode === 'exam' || s.mode === 'official-exam' || s.mode === 'official-exam-b' || s.mode === 'official-exam-c' || s.mode === 'official-exam-d';
       if (isAnyExam) {
         correctCount = 0;
         wrongCount = 0;
@@ -347,36 +420,45 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
   };
 
   // --- Skróty klawiszowe (tylko w widoku quizu, pomijamy fiszki) ---
+  // Trzymamy mutable ref na bieżący snapshot, żeby listener attachował się
+  // tylko raz (nie re-mount przy każdym kliknięciu odpowiedzi). Modale blokują
+  // klawiaturę — inaczej Enter w "Wyjdź z quizu?" wywoływałby goNext().
+  const kbdStateRef = useRef({
+    view,
+    session,
+    resetOpen,
+    exitOpen,
+    loginOpen,
+  });
+  kbdStateRef.current = { view, session, resetOpen, exitOpen, loginOpen };
+
   useEffect(() => {
-    if (view !== 'quiz' || !session) return;
-    if (session.mode === 'flashcards') return;
     const handler = (e: KeyboardEvent) => {
+      const s = kbdStateRef.current;
+      // Blokuj klawiaturę gdy modal jest otwarty — niech modal się sam obsłuży.
+      if (s.resetOpen || s.exitOpen || s.loginOpen) return;
+      if (s.view !== 'quiz' || !s.session) return;
+      if (s.session.mode === 'flashcards') return;
+
       const k = e.key.toLowerCase();
       const mapping: Record<string, number> = {
-        '1': 0,
-        '2': 1,
-        '3': 2,
-        '4': 3,
-        '5': 4,
-        a: 0,
-        b: 1,
-        c: 2,
-        d: 3,
-        e: 4,
+        '1': 0, '2': 1, '3': 2, '4': 3, '5': 4,
+        a: 0, b: 1, c: 2, d: 3, e: 4,
       };
       if (k in mapping) {
-        const q = session.questions[session.currentIdx];
+        const q = s.session.questions[s.session.currentIdx];
         if (mapping[k] >= q.a.length) return; // pytanie 4-opcyjne, klawisz E/5 nieaktywny
         e.preventDefault();
-        if (!session.answered) selectAnswer(mapping[k]);
+        if (!s.session.answered) selectAnswer(mapping[k]);
         return;
       }
       if (e.key === 'Enter') {
         e.preventDefault();
-        if (session.mode === 'exam' || session.mode === 'official-exam') {
+        const isExamLike = s.session.mode === 'exam' || officialExamLetter(s.session.mode) !== null;
+        if (isExamLike) {
           // Blokuj Enter gdy multi-correct i niepełny wybór (np. 1 z 2)
-          const q = session.questions[session.currentIdx];
-          const ans = session.answers[session.currentIdx];
+          const q = s.session.questions[s.session.currentIdx];
+          const ans = s.session.answers[s.session.currentIdx];
           if (
             Array.isArray(q.correct) &&
             Array.isArray(ans) &&
@@ -384,8 +466,8 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
             ans.length < q.correct.length
           ) return;
           goNext();
-        } else if (!session.answered) {
-          if (session.answers[session.currentIdx] !== null) submitAnswer();
+        } else if (!s.session.answered) {
+          if (s.session.answers[s.session.currentIdx] !== null) submitAnswer();
         } else {
           goNext();
         }
@@ -393,8 +475,9 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
+    // Listener attachuje się raz; aktualne state-y czyta przez ref.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [view, session]);
+  }, []);
 
   // --- Render ---
   return (
@@ -421,6 +504,7 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         onLogout={handleLogout}
       />
 
+      <UpdatePrompt />
       <InstallPrompt />
 
       {view === 'home' && (
@@ -428,32 +512,35 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
           appState={appState}
           cert={cert}
           onStartMode={startMode}
+          loadingExamLetter={loadingExamLetter}
         />
       )}
 
-      {view === 'setup' && pendingMode && pendingMode !== 'exam' && pendingMode !== 'official-exam' && (
-        <QuizSetup
-          mode={pendingMode}
-          cert={cert}
-          wrongIdsCount={appState.wrongIds.length}
-          onCancel={() => {
-            setPendingMode(null);
-            setView('home');
-          }}
-          onStart={(config) => beginQuiz(pendingMode, config)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {view === 'setup' && pendingMode && pendingMode !== 'exam' && pendingMode !== 'official-exam' && pendingMode !== 'official-exam-b' && pendingMode !== 'official-exam-c' && pendingMode !== 'official-exam-d' && (
+          <QuizSetup
+            mode={pendingMode}
+            cert={cert}
+            wrongIdsCount={appState.wrongIds.length}
+            onCancel={() => {
+              setPendingMode(null);
+              setView('home');
+            }}
+            onStart={(config) => beginQuiz(pendingMode, config)}
+          />
+        )}
 
-      {view === 'quiz' && session && session.mode === 'flashcards' && (
-        <Flashcard
-          question={session.questions[session.currentIdx]}
-          categoryLabel={cert.categories[session.questions[session.currentIdx].cat] ?? session.questions[session.currentIdx].cat}
-          currentIdx={session.currentIdx}
-          total={session.questions.length}
-          onRate={rateFlashcard}
-          onExit={() => setExitOpen(true)}
-        />
-      )}
+        {view === 'quiz' && session && session.mode === 'flashcards' && (
+          <Flashcard
+            question={session.questions[session.currentIdx]}
+            categoryLabel={cert.categories[session.questions[session.currentIdx].cat] ?? session.questions[session.currentIdx].cat}
+            currentIdx={session.currentIdx}
+            total={session.questions.length}
+            onRate={rateFlashcard}
+            onExit={() => setExitOpen(true)}
+          />
+        )}
+      </Suspense>
 
       {view === 'quiz' && session && session.mode !== 'flashcards' && (
         <QuizQuestion
@@ -474,10 +561,10 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
                 durationSec={cert.examDurationSec}
                 onTimeUp={finishQuiz}
               />
-            ) : session.mode === 'official-exam' ? (
+            ) : officialExamLetter(session.mode) !== null ? (
               <Timer
                 startTime={session.startTime}
-                durationSec={OFFICIAL_EXAM_CONFIG.durationSec}
+                durationSec={OFFICIAL_EXAM_META.durationSec}
                 onTimeUp={finishQuiz}
               />
             ) : null
@@ -486,11 +573,12 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
       )}
 
       {view === 'results' && session && (
+        <Suspense fallback={null}>
         <QuizResults
           mode={session.mode}
           examPassPct={
-            session.mode === 'official-exam'
-              ? OFFICIAL_EXAM_CONFIG.passPct
+            officialExamLetter(session.mode) !== null
+              ? OFFICIAL_EXAM_META.passPct
               : cert.examPassPct
           }
           questions={session.questions}
@@ -517,6 +605,7 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
             setView('home');
           }}
         />
+        </Suspense>
       )}
 
       <ConfirmModal
@@ -538,11 +627,26 @@ export default function App({ cert, certs, onSwitchCert }: Props) {
         onCancel={() => setExitOpen(false)}
       />
 
-      <LoginModal
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSubmit={signInWithMagicLink}
-      />
+      <Suspense fallback={null}>
+        {loginOpen && (
+          <LoginModal
+            open={loginOpen}
+            onClose={() => setLoginOpen(false)}
+            onSubmit={signInWithMagicLink}
+            onGoogle={handleGoogleSignIn}
+          />
+        )}
+        {onboardingOpen && (
+          <OnboardingModal
+            open={onboardingOpen}
+            onGoogle={handleGoogleSignIn}
+            onEmail={handleOnboardingEmail}
+            onSkip={handleOnboardingSkip}
+            loadingGoogle={googleLoading}
+            googleError={googleError}
+          />
+        )}
+      </Suspense>
 
       {toast && (
         <Toast

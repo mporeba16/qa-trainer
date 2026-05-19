@@ -12,6 +12,7 @@ type AuthState = {
 // (magic link → automatyczna detekcja URL hash po redirecie z emaila).
 export function useAuth(): AuthState & {
   signInWithMagicLink: (email: string) => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 } {
   const [user, setUser] = useState<User | null>(null);
@@ -53,6 +54,22 @@ export function useAuth(): AuthState & {
     return { error: error?.message ?? null };
   };
 
+  // OAuth Google — redirect flow. Supabase otwiera Google sign-in,
+  // po sukcesie wraca na current origin z tokenem w URL hash, który
+  // onAuthStateChange (powyżej) automatycznie odczyta i ustawi sesję.
+  // Wymaga skonfigurowania Google provider w Supabase Dashboard
+  // (Auth → Providers → Google) z Client ID/Secret z Google Cloud Console.
+  const signInWithGoogle = async () => {
+    if (!supabase) return { error: 'Supabase nie jest skonfigurowany.' };
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    });
+    return { error: error?.message ?? null };
+  };
+
   const signOut = async () => {
     if (!supabase) return;
     await supabase.auth.signOut();
@@ -63,6 +80,7 @@ export function useAuth(): AuthState & {
     loading,
     enabled: supabaseEnabled,
     signInWithMagicLink,
+    signInWithGoogle,
     signOut,
   };
 }
